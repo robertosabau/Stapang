@@ -27,7 +27,7 @@ pub enum TokenType{
     BigEqu, //>=
     LowEqu, //<=
     //Values
-    Var, //Variable
+    Ide, //Variable
     Num, //Number
     Car, //Caracter
     Str, //String

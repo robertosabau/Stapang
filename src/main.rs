@@ -1,6 +1,8 @@
 use std::env;
 use std::fs;
-mod Tokens;
+mod tokens;
+mod lexer;
+
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -13,6 +15,7 @@ fn main() {
 
     match fs::read_to_string(ruta_archivo) {
         Ok(contenido) => {
+            let tokens: Vec<tokens::Token>;
             
         }
         Err(error) => {
