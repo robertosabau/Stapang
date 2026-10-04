@@ -12,6 +12,9 @@ pub enum TokenType{
     Print, //Print the first element of the Stack
     If, //Conditional
     While, //Loop
+    Var, //Declaration variable
+    Arr, //Declaration array
+    Read, //Read keyworld
     //Operators
     Add, // +
     Sub, // -
@@ -31,6 +34,8 @@ pub enum TokenType{
     //Especial Caracters
     OCB, //Open Curvy Bracket
     CCB, //Close Curvy Bracket
+    OBR, //Open Bracket
+    CBR, //Close Bracket
     EOL, // End of Line
     EOC, //End of Code
 }
