@@ -4,6 +4,7 @@ pub struct Token{
     pub colum: usize,
     pub value: String
 }
+#[derive(PartialEq)]
 pub enum TokenType{
     Void=0,
     //Keyworlds
@@ -32,6 +33,8 @@ pub enum TokenType{
     Car, //Caracter
     Str, //String
     //Especial Caracters
+    OPA, //Open Parentesis
+    CPA, //Close Parentesis
     OCB, //Open Curvy Bracket
     CCB, //Close Curvy Bracket
     OBR, //Open Bracket
