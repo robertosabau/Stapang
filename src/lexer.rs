@@ -1,28 +1,63 @@
 use crate::tokens;
 
-
 pub fn tokenize(code: &str) -> Vec<tokens::Token>{
-    let token_list: Vec<tokens::Token>=Vec::new();
+    let mut token_list: Vec<tokens::Token>=Vec::new();
     let caracteres: Vec<char> = code.chars().collect();
     let mut index=0;
-    let mut _columm=1;
     let mut _line=1;
     let mut caracter;
     while index<caracteres.len(){
         caracter=caracteres[index];
-        while is_useless(&caracter, &mut _line, &mut _columm){
+        while is_useless(&caracter, &mut _line,){
             index+=1;
             caracter=caracteres[index];
         }
-        if is_special_caracter(caracter, token_list,_line,_columm){
-            _columm+=1;
+        if is_special_caracter(caracter, &mut token_list,_line){
             index += 1;
             continue;
+        }
+        if is_comentery(caracter){
+            while index<caracteres.len()&&caracter!='\n'{
+                index+=1;
+                if index<caracteres.len(){
+                    caracter=caracteres[index];
+                }
+            }
+            if caracter=='\n'{
+                _line+=1;
+            }
+            index+=1;
+            continue;
+        }
+        if caracter=='\"'{
+            index+=1;
+            caracter=caracteres[index];
+            let mut name:String=String::from("");
+            while index<caracteres.len()&&caracter!='\"'{
+                if caracter=='\n'{
+                    _line+=1;
+                }
+                name.push(caracter);
+                index+=1;
+                if index<caracteres.len(){
+                    caracter=caracteres[index];
+                }
+            }
+            if caracter=='\"'{
+                let token=tokens::Token{
+                    kind:tokens::TokenType::Str,
+                    line:_line,
+                    value:name,
+                };
+                token_list.push(token);
+                continue;
+            }
+
         }
     }
     return token_list;
 }
-fn is_special_caracter(caracter: char,list: Vec<tokens::Token>,_line: usize,_columm: usize)->bool{
+fn is_special_caracter(caracter: char,list: &mut Vec<tokens::Token>,_line: usize)->bool{
     let token_kind=match caracter{
         '('=>tokens::TokenType::OPA,
         ')'=>tokens::TokenType::CPA,
@@ -37,28 +72,28 @@ fn is_special_caracter(caracter: char,list: Vec<tokens::Token>,_line: usize,_col
         return false;
     }
     let token = tokens::Token {
-    kind: token_kind,
-    line: _line,
-    colum: _columm,                     
-    value: String::from("valor"), 
-};
+        kind: token_kind,
+        line: _line,                    
+        value: String::from(""),
+    };
+    list.push(token);
     return true;
 }
-fn is_useless(car:&char,lin:&mut usize,col:&mut usize)->bool{
+fn is_useless(car:&char,lin:&mut usize)->bool{
     match *car{
         ' '|'\r'=>{
-            *col+=1;
             return true;
         },
         '\t'=>{
-            *col+=4;
             return true;
         },
         '\n'=>{
-            *col=0;
             *lin+=1;
             return true;
         }
         _=>return false,
     }
+}
+fn is_comentery(car: char)->bool{
+    return car=='#';
 }

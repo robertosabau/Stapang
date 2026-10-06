@@ -15,7 +15,8 @@ fn main() {
 
     match fs::read_to_string(ruta_archivo) {
         Ok(contenido) => {
-            let tokens: Vec<tokens::Token>;
+            let mut tokens: Vec<tokens::Token>;
+            tokens=lexer::tokenize(&contenido);
             
         }
         Err(error) => {

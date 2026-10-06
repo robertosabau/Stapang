@@ -1,8 +1,7 @@
 pub struct Token{
     pub kind: TokenType,
     pub line: usize,
-    pub colum: usize,
-    pub value: String
+    pub value: String,
 }
 #[derive(PartialEq)]
 pub enum TokenType{
@@ -30,7 +29,6 @@ pub enum TokenType{
     //Values
     Ide, //Variable
     Num, //Number
-    Car, //Caracter
     Str, //String
     //Especial Caracters
     OPA, //Open Parentesis
