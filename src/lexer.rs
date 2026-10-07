@@ -1,6 +1,6 @@
 use crate::tokens;
 
-pub fn tokenize(code: &str) -> Vec<tokens::Token>{
+pub fn tokenize(code: String) -> Vec<tokens::Token>{
     let mut token_list: Vec<tokens::Token>=Vec::new();
     let caracteres: Vec<char> = code.chars().collect();
     let mut index=0;
@@ -10,7 +10,9 @@ pub fn tokenize(code: &str) -> Vec<tokens::Token>{
         caracter=caracteres[index];
         while is_useless(&caracter, &mut _line,){
             index+=1;
-            caracter=caracteres[index];
+            if index<caracteres.len(){
+                caracter=caracteres[index];
+            }
         }
         if is_special_caracter(caracter, &mut token_list,_line){
             index += 1;
@@ -51,6 +53,22 @@ pub fn tokenize(code: &str) -> Vec<tokens::Token>{
                 };
                 token_list.push(token);
                 continue;
+            }
+
+        }
+        else{
+            let mut name:String=String::from("");
+            while index<caracteres.len()&&!is_useless(&caracter, &mut _line){
+                name.push(caracter);
+                index+=1;
+                if index<caracteres.len(){
+                    caracter=caracteres[index];
+                }
+                if is_number(&mut token_list,&name, _line){
+                    index+=1;
+                    continue;
+                }
+                
             }
 
         }
@@ -96,4 +114,18 @@ fn is_useless(car:&char,lin:&mut usize)->bool{
 }
 fn is_comentery(car: char)->bool{
     return car=='#';
+}
+fn is_number(list: &mut Vec<tokens::Token>,text: &str,_line: usize)->bool{
+     match text.parse::<f64>() {
+        Ok(_) => {
+            let token = tokens::Token {
+            kind: tokens::TokenType::Num,
+            line: _line,                    
+            value: String::from(text),
+            };
+            list.push(token);
+            return true;
+        },
+        Err(_) => return false,
+    };
 }
