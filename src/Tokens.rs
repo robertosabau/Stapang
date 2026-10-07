@@ -6,7 +6,7 @@ pub struct Token{
 #[derive(PartialEq)]
 pub enum TokenType{
     Void=0,
-    //Keyworlds
+    //Keyworlds instructions
     Pop, //Take out first element of the Stack
     Push, //Put an element on the of the Stack
     Print, //Print the first element of the Stack
@@ -15,6 +15,7 @@ pub enum TokenType{
     Var, //Declaration variable
     Arr, //Declaration array
     Read, //Read keyworld
+    //KeyWorlds no instructions
     //Operators
     Add, // +
     Sub, // -
