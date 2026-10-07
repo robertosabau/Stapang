@@ -4,6 +4,6 @@ pub struct LexerError{
 }
 pub enum ErrorType{
     UnclosedString,
-    InavalidCaracter,
+    InvalidCharacter,
     InvalidIndentifier
 }

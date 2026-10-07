@@ -10,6 +10,13 @@ pub fn tokenize(code: String) -> Result<Vec<tokens::Token>, lexer_error::LexerEr
     let mut name: String;
     while index<caracteres.len(){
         caracter=caracteres[index];
+        if is_invalid_caracter(caracter){
+            let error=lexer_error::LexerError{
+                kind: lexer_error::ErrorType::InvalidCharacter,
+                line: _line
+            };
+            return Err(error);
+        }
         while is_useless(&caracter, &mut _line,){
             index+=1;
             if index<caracteres.len(){
@@ -82,12 +89,21 @@ pub fn tokenize(code: String) -> Result<Vec<tokens::Token>, lexer_error::LexerEr
                 if is_keyword(&mut token_list,&name, _line){
                     continue;
                 }
-                let token=tokens::Token{
-                    kind: tokens::TokenType::Ide,
-                    line: _line,
-                    value: name.clone(),
-                };
-                token_list.push(token);
+                if !contains_invalid_caracter(&name){
+                    let token=tokens::Token{
+                        kind: tokens::TokenType::Ide,
+                        line: _line,
+                        value: name.clone(),
+                    };
+                    token_list.push(token);
+                }
+                else{
+                    let error=lexer_error::LexerError{
+                        kind: lexer_error::ErrorType::InvalidIndentifier,
+                        line: _line
+                    };
+                    return Err(error);
+                }
         }
     }
     let token=tokens::Token{
@@ -183,10 +199,23 @@ fn is_keyword(list: &mut Vec<tokens::Token>,text: &String,_line: usize)->bool{
     list.push(token);
     return true;
 }
-fn is_invalid_caracter(caracter: char,_line: usize)->bool{
+fn is_invalid_caracter(caracter: char)->bool{
     match caracter{
-        _=>{
+        c if c.is_alphanumeric()||is_comentery(c)||is_usefull_special_caracter(c) => false,
+        _=>true,
+    }
+}
+fn is_usefull_special_caracter(caracter: char)->bool{
+    return caracter=='('||caracter==')'||caracter=='{'
+    ||caracter=='}'||caracter=='['||caracter==']'||caracter==';'
+    ||caracter==' '||caracter=='\n'||caracter=='\r'
+    ||caracter=='\t'||caracter=='\"'
+}
+fn contains_invalid_caracter(ide: &String)->bool{
+    for c in ide.chars(){
+        if is_invalid_caracter(c){
             return true;
-        },
-    };
+        }
+    }
+    false
 }

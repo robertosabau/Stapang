@@ -11,9 +11,9 @@ fn main() {
         std::process::exit(1);
     }
 
-    let ruta_archivo = &args[1];
+    let file_route = &args[1];
 
-    match fs::read_to_string(ruta_archivo) {
+    match fs::read_to_string(file_route) {
         Ok(code) => {
             let tokens: Vec<tokens::Token>;
             match lexer::tokenize(code){
@@ -25,6 +25,7 @@ fn main() {
             }
         };}
         Err(error) => {
+            eprintln!("Has ocurred an error: {}",error);
             std::process::exit(1);
         }
     }
