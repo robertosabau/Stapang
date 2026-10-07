@@ -189,6 +189,7 @@ fn is_keyword(list: &mut Vec<tokens::Token>,text: &String,_line: usize)->bool{
         "lower"=>token_kind=tokens::TokenType::Low,
         "biggerEqual"=>token_kind=tokens::TokenType::BigEqu,
         "lowerEqual"=>token_kind=tokens::TokenType::LowEqu,
+        "save"=>token_kind=tokens::TokenType::Save,
         _=> return false,
     }
     let token=tokens::Token{
