@@ -3,7 +3,7 @@ pub struct Token{
     pub line: usize,
     pub value: String,
 }
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum TokenType{
     Void=0,
     //Keyworlds instructions

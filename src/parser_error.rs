@@ -3,6 +3,7 @@ pub struct ParserError{
     pub line: usize,
 }
 pub enum ErrorType{
+    KeyWorldExpected,
     UnclosedString,
     InvalidCharacter,
     InvalidIndentifier
