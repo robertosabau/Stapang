@@ -4,7 +4,9 @@ pub struct ParserError{
 }
 pub enum ErrorType{
     KeyWorldExpected,
-    UnclosedString,
-    InvalidCharacter,
-    InvalidIndentifier
+    ValueExcepted,
+    SemiColonExpected,
+    OpenBracketExpected,
+    CloseBrakectExpected,
+    NumberExpected,
 }

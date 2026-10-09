@@ -5,12 +5,14 @@ use crate::lexer_error::ErrorType::InvalidCharacter;
 use crate::lexer_error::ErrorType::InvalidIndentifier;
 use crate::lexer_error::ErrorType::UnclosedString;
 use crate::lexer_error::LexerError;
+use crate::parser_error::ParserError;
 mod tokens;
 mod lexer;
 mod lexer_error;
 mod node;
 mod parser;
 mod parser_error;
+mod value;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -31,12 +33,14 @@ fn main() {
 
                     },
                     Err(problem)=>{
-                        
+                        show_parser_error(problem);
+                        std::process::exit(1);
                     }
                 }
             },
             Err(problem)=>{
                 show_lexer_error(problem);
+                std::process::exit(1);
             }
         };}
         Err(error) => {
@@ -58,6 +62,28 @@ fn show_lexer_error(error:LexerError){
         }
         InvalidIndentifier=>{
             eprintln!("Syntax Error: A invalid identifier found in line {}",error.line);
+        }
+    }
+}
+fn show_parser_error(error:ParserError){
+    match error.kind{
+        parser_error::ErrorType::KeyWorldExpected=>{
+            eprintln!("Syntax Error: An keyworld was expeted in line {}",error.line);
+        }
+        parser_error::ErrorType::ValueExcepted=>{
+            eprintln!("Syntax Error: An value was expected in line{}",error.line);
+        }
+        parser_error::ErrorType::SemiColonExpected=>{
+            eprintln!("Syntax Error: ; expected in line{}",error.line);
+        }
+        parser_error::ErrorType::OpenBracketExpected=>{
+            eprintln!("Syntax Error: An value was expected in line{}",error.line);
+        }
+        parser_error::ErrorType::CloseBrakectExpected=>{
+            eprintln!("Syntax Error: ; expected in line{}",error.line);
+        }
+        parser_error::ErrorType::NumberExpected=>{
+            eprintln!("Syntax Error: ; expected in line{}",error.line);
         }
     }
 }

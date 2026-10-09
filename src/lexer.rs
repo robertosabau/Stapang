@@ -190,6 +190,12 @@ fn is_keyword(list: &mut Vec<tokens::Token>,text: &String,_line: usize)->bool{
         "biggerEqual"=>token_kind=tokens::TokenType::BigEqu,
         "lowerEqual"=>token_kind=tokens::TokenType::LowEqu,
         "save"=>token_kind=tokens::TokenType::Save,
+        "and"=>token_kind=tokens::TokenType::And,
+        "or"=>token_kind=tokens::TokenType::Or,
+        "not"=>token_kind=tokens::TokenType::Not,
+        "True"=>token_kind=tokens::TokenType::True,
+        "False"=>token_kind=tokens::TokenType::False,
+        "Null"=>token_kind=tokens::TokenType::Null,
         _=> return false,
     }
     let token=tokens::Token{
