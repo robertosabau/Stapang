@@ -3,12 +3,10 @@ use crate::tokens;
 pub struct Node{
     pub kind: NodeType,
     pub tokens: Vec<tokens::Token>,
-    pub array: bool,
-    pub position: usize,
 }
 
 pub enum NodeType{
-    Popnode, //Node for Pop instruction
+    Popnode {array:bool,position:usize,name: String}, //Node for Pop instruction
     Pushnode, //Node for push instruction
     PrintNode, //Node for print instruction
     IfNode, //Node for if instruction
