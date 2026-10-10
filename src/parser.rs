@@ -93,12 +93,14 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
 }
 
 fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
-    let node_tokens:Vec<tokens::Token>;
+    let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
     let kind= node::NodeType::Popnode;
     let num;
     *index+=1;
+    //Checking if their is an identifier after the pop
     if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
         *token=<tokens::Token as Clone>::clone(&tokens[*index]);
     }else{
         let error=parser_error::ParserError{
@@ -115,7 +117,9 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         return Err(error);
     }
     *index+=1;
+    //Checking if is closed the sentence or if there the position of an array
     if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
         *token=<tokens::Token as Clone>::clone(&tokens[*index]);
     }else{
         let error=parser_error::ParserError{
@@ -124,20 +128,30 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
+    //Checking if is the end of the sentence
     if token.kind==tokens::TokenType::EOL{
-        let nodo=node::Node{
+        node=node::Node{
             kind: kind,
             tokens: node_tokens,
             array: false,
             position: 0,
         };
-        return Ok(nodo);
+        return Ok(node);
+    }
+    //Cheching case for arrays
+    if token.kind!=tokens::TokenType::OBR{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::OpenBracketExpected ,
+            line: token.line,
+        };
+        return Err(error);
     }
     if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
         *token=<tokens::Token as Clone>::clone(&tokens[*index]);
     }else{
         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::OpenBracketExpected ,
+            kind: parser_error::ErrorType::NumberExpected,
             line: token.line,
         };
         return Err(error);
@@ -149,12 +163,30 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
-    num=token.value;
+    num=token.value.clone();
     if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
         *token=<tokens::Token as Clone>::clone(&tokens[*index]);
     }else{
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::CloseBrakectExpected ,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::CBR{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::CloseBrakectExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token=<tokens::Token as Clone>::clone(&tokens[*index]);
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::SemiColonExpected ,
             line: token.line,
         };
         return Err(error);
@@ -166,6 +198,12 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
-
-    return Ok(nodo);
+    node_tokens.push(tokens[*index].clone());
+    node=node::Node{
+        kind: kind,
+        tokens: node_tokens,
+        array: true,
+        position: num.parse().unwrap(),
+    };
+    return Ok(node);
 }
