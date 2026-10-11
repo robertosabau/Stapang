@@ -175,6 +175,7 @@ fn is_keyword(list: &mut Vec<tokens::Token>,text: &String,_line: usize)->bool{
         "push"=>token_kind=tokens::TokenType::Push,
         "print"=>token_kind=tokens::TokenType::Print,
         "if"=>token_kind=tokens::TokenType::If,
+        "else"=>token_kind=tokens::TokenType::Else,
         "while"=>token_kind=tokens::TokenType::While,
         "var"=>token_kind=tokens::TokenType::Var,
         "arr"=>token_kind=tokens::TokenType::Arr,

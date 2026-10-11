@@ -12,6 +12,7 @@ pub enum TokenType{
     Push, //Put an element on the of the Stack
     Print, //Print the first element of the Stack
     If, //Conditional
+    Else, //An else situation
     While, //Loop
     Var, //Declaration variable
     Arr, //Declaration array

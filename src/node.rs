@@ -1,4 +1,5 @@
 use crate::tokens;
+use crate::tokens::TokenType;
 use crate::value;
 
 pub struct Node{
@@ -7,13 +8,14 @@ pub struct Node{
 }
 
 pub enum NodeType{
+    VoidNode, //Node for the case their is not else instruction in the if node
     Popnode {array:bool,position:usize,name: String}, //Node for Pop instruction
-    Pushnode, //Node for push instruction
+    Pushnode {array:bool,name:String,kind:tokens::TokenType,postion:usize}, //Node for push instruction
     PrintNode, //Node for print instruction
-    IfNode, //Node for if instruction
-    WhileNode, //Node for while instruction
-    VarNode, //Node for var instruction
-    ArrNode, //Node for arr instruction
+    IfNode{instructions:Vec<Node>,else_instructions:Vec<Node>}, //Node for if instruction
+    WhileNode{instructions:Vec<Node>}, //Node for while instruction
+    VarNode {name: String}, //Node for var instruction
+    ArrNode {name: String,postions:String},//Node for arr instruction
     SaveNode {value: value::Value}, //Node for save instruction
     ReadNode, //Node for read instruction
     AddNode, //Node for add instruction

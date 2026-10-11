@@ -21,7 +21,6 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
                 }
             },
             tokens::TokenType::Push=>{
-
             },
             tokens::TokenType::Print | tokens::TokenType::Read | tokens::TokenType::Add 
             | tokens::TokenType::Sub | tokens::TokenType::Mult | tokens::TokenType::Div
