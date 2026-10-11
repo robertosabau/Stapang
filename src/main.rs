@@ -85,5 +85,8 @@ fn show_parser_error(error:ParserError){
         parser_error::ErrorType::NumberExpected=>{
             eprintln!("Syntax Error: ; expected in line{}",error.line);
         }
+        parser_error::ErrorType::BooleanExpected=>{
+            eprintln!("Syntax Error: ; expected in line{}",error.line);
+        }
     }
 }

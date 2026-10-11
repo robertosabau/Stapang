@@ -1,6 +1,6 @@
 pub struct Value{
-    kind: ValueType,
-    value: String,
+    pub kind: ValueType,
+    pub value: String,
 }
 
 pub enum ValueType{

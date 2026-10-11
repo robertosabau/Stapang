@@ -1,6 +1,7 @@
 use crate::tokens;
 use crate::node;
 use crate::parser_error;
+use crate::value;
 
 pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error::ParserError>{
     let mut node_list:Vec<node::Node>=Vec::new();
@@ -22,7 +23,11 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
             tokens::TokenType::Push=>{
 
             },
-            tokens::TokenType::Print=>{
+            tokens::TokenType::Print | tokens::TokenType::Read | tokens::TokenType::Add 
+            | tokens::TokenType::Sub | tokens::TokenType::Mult | tokens::TokenType::Div
+            | tokens::TokenType::Equ | tokens::TokenType::Big | tokens::TokenType::Low
+            | tokens::TokenType::BigEqu| tokens::TokenType::LowEqu | tokens::TokenType::Not
+            | tokens::TokenType::And | tokens::TokenType::Or=>{
                 match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
                     Ok(node)=>{
                         node_list.push(node);
@@ -45,130 +50,7 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
 
             },
             tokens::TokenType::Save=>{
-
-            },
-            tokens::TokenType::Read=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::Add=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::Sub=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::Mult=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::Div=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::Equ=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::Big=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::Low=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::BigEqu=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::LowEqu=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::Not=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::And=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
-                    Ok(node)=>{
-                        node_list.push(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
-            tokens::TokenType::Or=>{
-                match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
+                match is_save(&mut token,&tokens,&mut index){
                     Ok(node)=>{
                         node_list.push(node);
                     },
@@ -378,8 +260,84 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
         return Err(error);
         }
     }
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::SemiColonExpected ,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::EOL{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::SemiColonExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    node_tokens.push(tokens[*index].clone());
     node=node::Node{
         kind: node_kind,
+        tokens: node_tokens,
+    };
+    Ok(node)
+}
+fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
+    let mut node_tokens:Vec<tokens::Token>=Vec::new();
+    let node: node::Node;
+    let value:value::Value;
+    *index+=1;
+    //Checking if their is an value
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token=<tokens::Token as Clone>::clone(&tokens[*index]);
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::BooleanExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::True&&token.kind!=tokens::TokenType::False{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::BooleanExpected ,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    let val:String=match token.kind{
+        tokens::TokenType::True => String::from("True"),
+        tokens::TokenType::False => String::from("False"),
+        _ => String::from("Error"),
+    };
+    *index+=1;
+    //Checking if their is an value
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::SemiColonExpected ,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::EOL{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::SemiColonExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    node_tokens.push(tokens[*index].clone());
+    value=value::Value{
+        kind: value::ValueType::Boolean,
+        value: val,
+    };
+    node=node::Node{
+        kind: node::NodeType::SaveNode { value:value },
         tokens: node_tokens,
     };
     Ok(node)
