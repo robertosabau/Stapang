@@ -43,7 +43,14 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
 
             },
             tokens::TokenType::Var=>{
-
+                match is_var(&mut token,&tokens,&mut index){
+                    Ok(node)=>{
+                        node_list.push(node);
+                    },
+                    Err(error)=>{
+                        return Err(error);
+                    }
+                }
             },
             tokens::TokenType::Arr=>{
 
@@ -190,7 +197,7 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
     //Checking if their is an semicolon
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
-        *token=<tokens::Token as Clone>::clone(&tokens[*index]);
+        *token = tokens[*index].clone();
     }else{
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::SemiColonExpected ,
@@ -291,7 +298,7 @@ fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
     //Checking if their is an value
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
-        *token=<tokens::Token as Clone>::clone(&tokens[*index]);
+        *token = tokens[*index].clone();
     }else{
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::BooleanExpected,
@@ -338,6 +345,55 @@ fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
     node=node::Node{
         kind: node::NodeType::SaveNode { value:value },
         tokens: node_tokens,
+    };
+    Ok(node)
+}
+fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
+    let mut node_tokens:Vec<tokens::Token>=Vec::new();
+    let node: node::Node;
+    let name:String;
+    *index+=1;
+    //Checking if their is an value
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::ValueExcepted,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::Ide{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::ValueExcepted ,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    name=token.value.clone();
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::SemiColonExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::EOL{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::SemiColonExpected ,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    node_tokens.push(tokens[*index].clone());
+    *token = tokens[*index].clone();
+    node=node::Node{
+        kind:node::NodeType::VarNode { name:name },
+        tokens:node_tokens
     };
     Ok(node)
 }
