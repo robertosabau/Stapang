@@ -77,16 +77,22 @@ fn show_parser_error(error:ParserError){
             eprintln!("Syntax Error: ; expected in line{}",error.line);
         }
         parser_error::ErrorType::OpenBracketExpected=>{
-            eprintln!("Syntax Error: An value was expected in line{}",error.line);
+            eprintln!("Syntax Error: [ expected in line{}",error.line);
         }
         parser_error::ErrorType::CloseBrakectExpected=>{
-            eprintln!("Syntax Error: ; expected in line{}",error.line);
+            eprintln!("Syntax Error: ] expected in line{}",error.line);
         }
         parser_error::ErrorType::NumberExpected=>{
-            eprintln!("Syntax Error: ; expected in line{}",error.line);
+            eprintln!("Syntax Error: number expected in line{}",error.line);
         }
         parser_error::ErrorType::BooleanExpected=>{
-            eprintln!("Syntax Error: ; expected in line{}",error.line);
+            eprintln!("Syntax Error: boolean expected in line{}",error.line);
+        }
+        parser_error::ErrorType::OpenCurvyBrackedExpected=>{
+            eprintln!("Syntax Error: {{ expected in line{}",error.line);
+        }
+        parser_error::ErrorType::CloseCurvyBrackedExpected=>{
+            eprintln!("Syntax Error: }} expected in line{}",error.line);
         }
     }
 }

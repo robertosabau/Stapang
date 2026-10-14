@@ -9,11 +9,25 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
     let mut token;
     while index<tokens.len(){
         token=tokens[index].clone();
-        match token.kind{
+        match generate_node(&mut token,&tokens,&mut index){
+            Ok(node)=>{
+                node_list.push(node);
+            }
+            Err(error)=>{
+                return Err(error);
+            }
+        }
+    }
+    Ok(node_list)
+}
+
+fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut index: &mut usize)->Result<node::Node, parser_error::ParserError>{
+    match token.kind{
             tokens::TokenType::Pop=>{
                 match is_pop(&mut token,&tokens,&mut index){
                     Ok(node)=>{
-                        node_list.push(node);
+                        *index+=1;
+                        return Ok(node);
                     },
                     Err(error)=>{
                         return Err(error);
@@ -29,7 +43,8 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
             | tokens::TokenType::And | tokens::TokenType::Or=>{
                 match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
                     Ok(node)=>{
-                        node_list.push(node);
+                        *index+=1;
+                        return Ok(node);
                     },
                     Err(error)=>{
                         return Err(error);
@@ -40,12 +55,21 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
 
             },
             tokens::TokenType::While=>{
-
+                match is_while(&mut token,&tokens,&mut index){
+                    Ok(node)=>{
+                        *index+=1;
+                        return Ok(node);
+                    }
+                    Err(error)=>{
+                        return Err(error);
+                    }
+                }
             },
             tokens::TokenType::Var=>{
                 match is_var(&mut token,&tokens,&mut index){
                     Ok(node)=>{
-                        node_list.push(node);
+                        *index+=1;
+                        return Ok(node);
                     },
                     Err(error)=>{
                         return Err(error);
@@ -55,7 +79,8 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
             tokens::TokenType::Arr=>{
                 match is_arr(&mut token,&tokens,&mut index){
                     Ok(node)=>{
-                        node_list.push(node);
+                        *index+=1;
+                        return Ok(node);
                     },
                     Err(error)=>{
                         return Err(error);
@@ -65,7 +90,8 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
             tokens::TokenType::Save=>{
                 match is_save(&mut token,&tokens,&mut index){
                     Ok(node)=>{
-                        node_list.push(node);
+                        *index+=1;
+                        return Ok(node);
                     },
                     Err(error)=>{
                         return Err(error);
@@ -74,15 +100,18 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
             },
             _=>{
                 let error=parser_error::ParserError{
-                kind: parser_error::ErrorType::KeyWorldExpected,
-                line: token.line,
+                    kind: parser_error::ErrorType::KeyWorldExpected,
+                    line: token.line,
                 };
                 return Err(error);
             }
         };
-    }
-
-    Ok(node_list)
+    let node=node::Node{
+        kind: node::NodeType::VoidNode,
+        tokens: Vec::new()
+    };
+    *index+=1;
+    Ok(node)
 }
 
 fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
@@ -138,6 +167,7 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
+    *index+=1;
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
         *token = tokens[*index].clone();
@@ -155,6 +185,7 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
+    *index+=1;
     num=token.value.clone();
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
@@ -173,6 +204,7 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
+    *index+=1;
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
         *token = tokens[*index].clone();
@@ -202,6 +234,7 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
     let node: node::Node;
     let node_kind;
     //Checking if their is an semicolon
+    *index+=1;
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
         *token = tokens[*index].clone();
@@ -212,7 +245,7 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
         };
         return Err(error);
     }
-    if token.kind!=tokens::TokenType::Ide{
+    if token.kind!=tokens::TokenType::EOL{
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::SemiColonExpected,
             line: token.line,
@@ -378,6 +411,7 @@ fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
+    *index+=1;
     name=token.value.clone();
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
@@ -427,6 +461,7 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
+    *index+=1;
     name=token.value.clone();
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
@@ -445,6 +480,7 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
+    *index+=1;
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
         *token = tokens[*index].clone();
@@ -462,6 +498,7 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
+    *index+=1;
     let num=token.value.clone();
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
@@ -480,6 +517,17 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
+    *index+=1;
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::SemiColonExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
     if token.kind!=tokens::TokenType::EOL{
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::SemiColonExpected ,
@@ -492,6 +540,74 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     node=node::Node{
         kind:node::NodeType::ArrNode { name:name, positions:num },
         tokens:node_tokens
+    };
+    Ok(node)
+}
+fn is_while(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
+    let mut node_tokens:Vec<tokens::Token>=Vec::new();
+    let node: node::Node;
+    let mut nodes:Vec<node::Node>=Vec::new();
+    *index+=1;
+    //Checking if their is an value
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::OCB{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    *index+=1;
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    while *index<tokens.len()&&token.kind!=tokens::TokenType::CCB{
+        match generate_node(token, tokens, index){
+            Ok(list)=>{
+                nodes.push(list);
+            }
+            Err(error)=>{
+                return Err(error);
+            }
+        }
+        if *index<tokens.len(){
+            node_tokens.push(tokens[*index].clone());
+            *token = tokens[*index].clone();
+        }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    }
+    if token.kind!=tokens::TokenType::CCB{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    node_tokens.push(tokens[*index].clone());
+    node=node::Node {
+        kind: node::NodeType::WhileNode { instructions: nodes }, 
+        tokens: node_tokens
     };
     Ok(node)
 }

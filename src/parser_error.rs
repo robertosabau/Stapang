@@ -10,4 +10,6 @@ pub enum ErrorType{
     CloseBrakectExpected,
     NumberExpected,
     BooleanExpected,
+    OpenCurvyBrackedExpected,
+    CloseCurvyBrackedExpected,
 }
