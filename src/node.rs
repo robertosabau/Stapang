@@ -7,7 +7,6 @@ pub struct Node{
 }
 
 pub enum NodeType{
-    //BORRING COMENT TO BE DELATED ANY TIME
     VoidNode, //Node for the case their is not else instruction in the if node
     Popnode {array:bool,position:usize,name: String}, //Node for Pop instruction
     Pushnode {array:bool,name:String,kind:tokens::TokenType,position:usize,value:value::Value}, //Node for push instruction
