@@ -40,6 +40,10 @@ pub enum TokenType{
     Ide, //Variable
     Num, //Number
     Str, //String
+    //Types
+    NumType, //Type for numbers
+    BoolType, //Type for boolean values
+    StrType, //Type for strings
     //Especial Caracters
     OPA, //Open Parentesis
     CPA, //Close Parentesis
@@ -47,6 +51,7 @@ pub enum TokenType{
     CCB, //Close Curvy Bracket
     OBR, //Open Bracket
     CBR, //Close Bracket
+    COL, //Colon
     EOL, // End of Line
     EOC, //End of Code
 }

@@ -123,6 +123,7 @@ fn is_special_caracter(caracter: char,list: &mut Vec<tokens::Token>,_line: usize
         '['=>tokens::TokenType::OBR,
         ']'=>tokens::TokenType::CBR,
         ';'=>tokens::TokenType::EOL,
+        ':'=>tokens::TokenType::COL,
         _=>tokens::TokenType::Void,
     };
     if token_kind==tokens::TokenType::Void  {
@@ -197,6 +198,9 @@ fn is_keyword(list: &mut Vec<tokens::Token>,text: &String,_line: usize)->bool{
         "True"=>token_kind=tokens::TokenType::True,
         "False"=>token_kind=tokens::TokenType::False,
         "Null"=>token_kind=tokens::TokenType::Null,
+        "num"=>token_kind=tokens::TokenType::NumType,
+        "bool"=>token_kind=tokens::TokenType::BoolType,
+        "str"=>token_kind=tokens::TokenType::StrType,
         _=> return false,
     }
     let token=tokens::Token{
@@ -217,7 +221,7 @@ fn is_usefull_special_caracter(caracter: char)->bool{
     return caracter=='('||caracter==')'||caracter=='{'
     ||caracter=='}'||caracter=='['||caracter==']'||caracter==';'
     ||caracter==' '||caracter=='\n'||caracter=='\r'
-    ||caracter=='\t'||caracter=='\"'
+    ||caracter=='\t'||caracter=='\"'||caracter==':'
 }
 fn contains_invalid_caracter(ide: &String)->bool{
     for c in ide.chars(){
