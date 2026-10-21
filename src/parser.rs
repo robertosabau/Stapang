@@ -1,7 +1,9 @@
 use crate::tokens;
 use crate::node;
 use crate::parser_error;
+use crate::tokens::TokenType;
 use crate::value;
+use crate::value::ValueType;
 
 pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error::ParserError>{
     let mut node_list:Vec<node::Node>=Vec::new();
@@ -229,6 +231,10 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     };
     return Ok(node);
 }
+/*
+pop name;
+pop name[number];
+*/
 fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
@@ -330,6 +336,9 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
     };
     Ok(node)
 }
+/*
+keywold;
+*/
 fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
@@ -388,6 +397,9 @@ fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
     };
     Ok(node)
 }
+/*
+save boolean;
+*/
 fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
@@ -411,8 +423,51 @@ fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
-    *index+=1;
     name=token.value.clone();
+    *index+=1;
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::ColonExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::COL{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::ColonExpected ,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    *index+=1;
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::TypeExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    let kind:ValueType;
+    match token.kind{
+        TokenType::NumType=>kind=ValueType::Number,
+        TokenType::StrType=>kind=ValueType::Text,
+        TokenType::BoolType=>kind=ValueType::Boolean,
+        TokenType::AnyType=>kind=ValueType::Any,
+        _=>{
+            let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::TypeExpected ,
+            line: token.line,
+        };
+        return Err(error);
+        }
+    }
+    *index+=1;
     if *index<tokens.len(){
         node_tokens.push(tokens[*index].clone());
         *token = tokens[*index].clone();
@@ -433,11 +488,14 @@ fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     node_tokens.push(tokens[*index].clone());
     *token = tokens[*index].clone();
     node=node::Node{
-        kind:node::NodeType::VarNode { name:name },
+        kind:node::NodeType::VarNode { name:name,kind:kind },
         tokens:node_tokens
     };
     Ok(node)
 }
+/*
+var name:kind;
+*/
 fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
@@ -523,6 +581,49 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         *token = tokens[*index].clone();
     }else{
         let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::ColonExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::COL{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::ColonExpected ,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    *index+=1;
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::TypeExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    let kind:ValueType;
+    match token.kind{
+        TokenType::NumType=>kind=ValueType::Number,
+        TokenType::StrType=>kind=ValueType::Text,
+        TokenType::BoolType=>kind=ValueType::Boolean,
+        TokenType::AnyType=>kind=ValueType::Any,
+        _=>{
+            let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::TypeExpected ,
+            line: token.line,
+        };
+        return Err(error);
+        }
+    }
+    *index+=1;
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
             kind: parser_error::ErrorType::SemiColonExpected,
             line: token.line,
         };
@@ -538,11 +639,14 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     node_tokens.push(tokens[*index].clone());
     *token = tokens[*index].clone();
     node=node::Node{
-        kind:node::NodeType::ArrNode { name:name, positions:num },
+        kind:node::NodeType::ArrNode { name:name, positions:num,kind:kind },
         tokens:node_tokens
     };
     Ok(node)
 }
+/*
+arr name[number]:kind;
+*/
 fn is_while(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
@@ -611,3 +715,8 @@ fn is_while(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usi
     };
     Ok(node)
 }
+/*
+while{
+    code
+}
+*/

@@ -7,5 +7,6 @@ pub enum ValueType{
     Text,
     Number,
     Boolean,
-    Null
+    Null,
+    Any
 }

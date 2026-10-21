@@ -1,5 +1,6 @@
 use crate::tokens;
 use crate::value;
+use crate::value::ValueType;
 
 pub struct Node{
     pub kind: NodeType,
@@ -13,8 +14,8 @@ pub enum NodeType{
     PrintNode, //Node for print instruction
     IfNode{instructions:Vec<Node>,else_instructions:Vec<Node>}, //Node for if instruction
     WhileNode{instructions:Vec<Node>}, //Node for while instruction
-    VarNode {name: String}, //Node for var instruction
-    ArrNode {name: String,positions:String},//Node for arr instruction
+    VarNode {name: String,kind:ValueType}, //Node for var instruction
+    ArrNode {name: String,positions:String,kind:ValueType},//Node for arr instruction
     SaveNode {value: value::Value}, //Node for save instruction
     ReadNode, //Node for read instruction
     AddNode, //Node for add instruction

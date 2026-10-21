@@ -12,4 +12,6 @@ pub enum ErrorType{
     BooleanExpected,
     OpenCurvyBrackedExpected,
     CloseCurvyBrackedExpected,
+    ColonExpected,
+    TypeExpected,
 }

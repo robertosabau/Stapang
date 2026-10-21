@@ -44,6 +44,7 @@ pub enum TokenType{
     NumType, //Type for numbers
     BoolType, //Type for boolean values
     StrType, //Type for strings
+    AnyType, //Type to have every value posible
     //Especial Caracters
     OPA, //Open Parentesis
     CPA, //Close Parentesis

@@ -94,5 +94,11 @@ fn show_parser_error(error:ParserError){
         parser_error::ErrorType::CloseCurvyBrackedExpected=>{
             eprintln!("Syntax Error: }} expected in line{}",error.line);
         }
+        parser_error::ErrorType::ColonExpected=>{
+            eprintln!("Syntax Error: : expected in line{}",error.line);
+        }
+        parser_error::ErrorType::TypeExpected=>{
+            eprintln!("Syntax Error: type expected in line{}",error.line);
+        }
     }
 }

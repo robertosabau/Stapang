@@ -201,6 +201,7 @@ fn is_keyword(list: &mut Vec<tokens::Token>,text: &String,_line: usize)->bool{
         "num"=>token_kind=tokens::TokenType::NumType,
         "bool"=>token_kind=tokens::TokenType::BoolType,
         "str"=>token_kind=tokens::TokenType::StrType,
+        "any"=>token_kind=tokens::TokenType::AnyType,
         _=> return false,
     }
     let token=tokens::Token{
