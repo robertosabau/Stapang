@@ -790,6 +790,7 @@ fn is_if(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize)-
         return Err(error);
     }
     node_tokens.push(tokens[*index].clone());
+    let mut alternative_node:Vec<node::Node>=Vec::new();
     if tokens[*index+1].kind==tokens::TokenType::Else{
         *index+=1;
     //Checking if their is an value
@@ -821,7 +822,6 @@ fn is_if(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize)-
         };
         return Err(error);
     }
-    let mut alternative_node:Vec<node::Node>=Vec::new();
     while *index<tokens.len()&&token.kind!=tokens::TokenType::CCB{
         match generate_node(token, tokens, index){
             Ok(list)=>{
