@@ -1,9 +1,6 @@
 use std::env;
 use std::fs;
 
-use crate::lexer_error::ErrorType::InvalidCharacter;
-use crate::lexer_error::ErrorType::InvalidIndentifier;
-use crate::lexer_error::ErrorType::UnclosedString;
 use crate::lexer_error::LexerError;
 use crate::parser_error::ParserError;
 mod tokens;
@@ -13,6 +10,7 @@ mod node;
 mod parser;
 mod parser_error;
 mod value;
+mod variable;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -54,13 +52,13 @@ fn main() {
 
 fn show_lexer_error(error:LexerError){
     match error.kind{
-        UnclosedString=>{
+        lexer_error::ErrorType::UnclosedString=>{
             eprintln!("Syntax Error: Unclosed String found in line {}",error.line);
         },
-        InvalidCharacter=>{
+        lexer_error::ErrorType::InvalidCharacter=>{
             eprintln!("Syntax Error: A invalid caracter found in line {}",error.line);
         }
-        InvalidIndentifier=>{
+        lexer_error::ErrorType::InvalidIndentifier=>{
             eprintln!("Syntax Error: A invalid identifier found in line {}",error.line);
         }
     }
