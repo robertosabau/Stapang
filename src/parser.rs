@@ -54,7 +54,15 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
                 }
             },
             tokens::TokenType::If=>{
-
+                match is_if(&mut token,&tokens,&mut index){
+                    Ok(node)=>{
+                        *index+=1;
+                        return Ok(node);
+                    }
+                    Err(error)=>{
+                        return Err(error);
+                    }
+                }
             },
             tokens::TokenType::While=>{
                 match is_while(&mut token,&tokens,&mut index){
@@ -719,4 +727,139 @@ fn is_while(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usi
 while{
     code
 }
+*/
+fn is_if(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize)->Result<node::Node,parser_error::ParserError>{
+    let mut node_tokens:Vec<tokens::Token>=Vec::new();
+    let node: node::Node;
+    let mut nodes:Vec<node::Node>=Vec::new();
+    *index+=1;
+    //Checking if their is an value
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::OCB{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    *index+=1;
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    while *index<tokens.len()&&token.kind!=tokens::TokenType::CCB{
+        match generate_node(token, tokens, index){
+            Ok(list)=>{
+                nodes.push(list);
+            }
+            Err(error)=>{
+                return Err(error);
+            }
+        }
+        if *index<tokens.len(){
+            node_tokens.push(tokens[*index].clone());
+            *token = tokens[*index].clone();
+        }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    }
+    if token.kind!=tokens::TokenType::CCB{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    node_tokens.push(tokens[*index].clone());
+    if tokens[*index+1].kind==tokens::TokenType::Else{
+        *index+=1;
+    //Checking if their is an value
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    if token.kind!=tokens::TokenType::OCB{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    *index+=1;
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+    }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    while *index<tokens.len()&&token.kind!=tokens::TokenType::CCB{
+        match generate_node(token, tokens, index){
+            Ok(list)=>{
+                nodes.push(list);
+            }
+            Err(error)=>{
+                return Err(error);
+            }
+        }
+        if *index<tokens.len(){
+            node_tokens.push(tokens[*index].clone());
+            *token = tokens[*index].clone();
+        }else{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    }
+    if token.kind!=tokens::TokenType::CCB{
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    }
+    node=node::Node {
+        kind: node::NodeType::WhileNode { instructions: nodes }, 
+        tokens: node_tokens
+    };
+    Ok(node)
+}
+/*
+if {
+    code
+}
+[else {
+    code
+}]
 */
