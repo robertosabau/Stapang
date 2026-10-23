@@ -149,25 +149,13 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         return Err(error);
     }
     name=token.value.clone();
-    *index+=1;
-    //Checking if is closed the sentence or if there the position of an array
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
+    //Checking if the sentence is closed with a semicolon, the end of the sentence
+    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
+         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::SemiColonExpected ,
             line: token.line,
         };
         return Err(error);
-    }
-    //Checking if is the end of the sentence
-    if token.kind==tokens::TokenType::EOL{
-        node=node::Node{
-            kind: node::NodeType::Popnode{array:false,position:0, name: name},
-            tokens: node_tokens,
-        };
-        return Ok(node);
     }
     //Cheching case for arrays
     if token.kind!=tokens::TokenType::OBR{
@@ -214,20 +202,10 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         };
         return Err(error);
     }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
+    //Checking if the sentence is closed with a semicolon, the end of the sentence
+    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
+         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::SemiColonExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::EOL{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::SemiColonExpected,
             line: token.line,
         };
         return Err(error);
@@ -247,21 +225,10 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
     let node_kind;
-    //Checking if their is an semicolon
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
+    //Checking if the sentence is closed with a semicolon, the end of the sentence
+    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
+         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::SemiColonExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::EOL{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::SemiColonExpected,
             line: token.line,
         };
         return Err(error);
@@ -320,23 +287,6 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
         return Err(error);
         }
     }
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::SemiColonExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::EOL{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::SemiColonExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
     node_tokens.push(tokens[*index].clone());
     node=node::Node{
         kind: node_kind,
@@ -375,21 +325,10 @@ fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
         tokens::TokenType::False => String::from("False"),
         _ => String::from("Error"),
     };
-    *index+=1;
-    //Checking if their is an value
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
+    //Checking if the sentence is closed with a semicolon, the end of the sentence
+    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
+         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::SemiColonExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::EOL{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::SemiColonExpected,
             line: token.line,
         };
         return Err(error);
@@ -475,19 +414,9 @@ fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         return Err(error);
         }
     }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::SemiColonExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::EOL{
-        let error=parser_error::ParserError{
+    //Checking if the sentence is closed with a semicolon, the end of the sentence
+    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
+         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::SemiColonExpected ,
             line: token.line,
         };
@@ -626,19 +555,9 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         return Err(error);
         }
     }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::SemiColonExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::EOL{
-        let error=parser_error::ParserError{
+    //Checking if the sentence is closed with a semicolon, the end of the sentence
+    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
+         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::SemiColonExpected ,
             line: token.line,
         };
@@ -864,3 +783,21 @@ if {
     code
 }]
 */
+//Function to check if their is the token we want
+fn check_if_is_token(kind:tokens::TokenType,token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
+    if !there_is_a_token(token, tokens, index, node_tokens)&&token.kind!=kind{
+        return false;
+    }
+    true
+}
+//Function to check if their is another token after the actual
+fn there_is_a_token(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
+    *index+=1;
+    if *index<tokens.len(){
+        node_tokens.push(tokens[*index].clone());
+        *token = tokens[*index].clone();
+        return true;
+    }else{
+        return false;
+    }
+}
