@@ -127,7 +127,7 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
 fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
-    let num;
+    let mut num:String=String::from("");
     let name;
     //Checking if their is an identifier to get where to put the value of the stack
     if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
@@ -138,54 +138,25 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         return Err(error);
     }
     name=token.value.clone();
-    //Checking if their is the identifier is for the case of an position in a array
+    //Checking if there is the identifier is for an array
     if check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
-        
-    }
-    //Cheching case for arrays
-    if token.kind!=tokens::TokenType::OBR{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::OpenBracketExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::NumberExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::Num{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::NumberExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    *index+=1;
-    num=token.value.clone();
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::CloseBrakectExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::CBR{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::CloseBrakectExpected,
-            line: token.line,
-        };
-        return Err(error);
+        //Checking if there is the number of the position in the array
+        if !check_if_is_token(tokens::TokenType::Num,token,tokens,index,&mut node_tokens){
+            let error=parser_error::ParserError{
+                kind: parser_error::ErrorType::NumberExpected,
+                line: token.line,
+            };
+            return Err(error);
+        }
+        num=token.value.clone();
+        //Checking if there is the closing bracked
+        if !check_if_is_token(tokens::TokenType::CBR,token,tokens,index,&mut node_tokens){
+            let error=parser_error::ParserError{
+                kind: parser_error::ErrorType::CloseBrakectExpected,
+                line: token.line,
+            };
+            return Err(error);
+        }
     }
     //Checking if the sentence is closed with a semicolon, the end of the sentence
     if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
@@ -288,10 +259,7 @@ fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
     let value:value::Value;
     *index+=1;
     //Checking if their is an value
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
+    if !there_is_a_token(token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::BooleanExpected,
             line: token.line,
@@ -336,19 +304,10 @@ fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
     let name:String;
+    let mut kind:ValueType=ValueType::Null;
     *index+=1;
-    //Checking if their is an value
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ValueExcepted,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::Ide{
+    //Checking if their is an identifier
+    if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::ValueExcepted ,
             line: token.line,
@@ -356,48 +315,21 @@ fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
         return Err(error);
     }
     name=token.value.clone();
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
+    //Checking if there is an colon to enter the type of the variable
+    if !check_if_is_token(tokens::TokenType::COL,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ColonExpected,
+            kind: parser_error::ErrorType::ValueExcepted ,
             line: token.line,
         };
         return Err(error);
     }
-    if token.kind!=tokens::TokenType::COL{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ColonExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
+    //Checking if there is an type for the array
+    if !there_is_a_type(&mut kind, token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::TypeExpected,
             line: token.line,
         };
         return Err(error);
-    }
-    let kind:ValueType;
-    match token.kind{
-        TokenType::NumType=>kind=ValueType::Number,
-        TokenType::StrType=>kind=ValueType::Text,
-        TokenType::BoolType=>kind=ValueType::Boolean,
-        TokenType::AnyType=>kind=ValueType::Any,
-        _=>{
-            let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::TypeExpected ,
-            line: token.line,
-        };
-        return Err(error);
-        }
     }
     //Checking if the sentence is closed with a semicolon, the end of the sentence
     if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
@@ -422,123 +354,58 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
     let name:String;
+    let num:String;
+    let mut kind:ValueType=ValueType::Null;
     *index+=1;
-    //Checking if their is an value
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ValueExcepted,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::Ide{
+    //Checking if their is an identifier
+    if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::ValueExcepted ,
             line: token.line,
         };
         return Err(error);
-    }
-    *index+=1;
+    };
     name=token.value.clone();
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::OpenBracketExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::OBR{
+    //Checking if their is an open bracket to set the number of position it will have the array
+    if !check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::OpenBracketExpected ,
             line: token.line,
         };
         return Err(error);
-    }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
+    };
+    //Checking if there is the number of the positions of the array
+    if !check_if_is_token(tokens::TokenType::Num,token,tokens,index,&mut node_tokens){
         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ValueExcepted,
+            kind: parser_error::ErrorType::NumberExpected,
             line: token.line,
         };
         return Err(error);
     }
-    if token.kind!=tokens::TokenType::Num{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ValueExcepted ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    *index+=1;
-    let num=token.value.clone();
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
+    num=token.value.clone();
+    //Checking if there is the closing bracked
+    if !check_if_is_token(tokens::TokenType::CBR,token,tokens,index,&mut node_tokens){
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::CloseBrakectExpected,
             line: token.line,
         };
         return Err(error);
     }
-    if token.kind!=tokens::TokenType::CBR{
+    //Checking if there is an colon to enter the type of the variable
+    if !check_if_is_token(tokens::TokenType::COL,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::CloseBrakectExpected ,
+            kind: parser_error::ErrorType::ValueExcepted ,
             line: token.line,
         };
         return Err(error);
     }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ColonExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::COL{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ColonExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
+    //Checking if there is an type for the array
+    if !there_is_a_type(&mut kind, token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::TypeExpected,
             line: token.line,
         };
         return Err(error);
-    }
-    let kind:ValueType;
-    match token.kind{
-        TokenType::NumType=>kind=ValueType::Number,
-        TokenType::StrType=>kind=ValueType::Text,
-        TokenType::BoolType=>kind=ValueType::Boolean,
-        TokenType::AnyType=>kind=ValueType::Any,
-        _=>{
-            let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::TypeExpected ,
-            line: token.line,
-        };
-        return Err(error);
-        }
     }
     //Checking if the sentence is closed with a semicolon, the end of the sentence
     if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
@@ -563,35 +430,21 @@ fn is_while(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usi
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
     let mut nodes:Vec<node::Node>=Vec::new();
-    *index+=1;
-    //Checking if their is an value
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
+    //Checking if their is an open curvy bracked to start the secuence of sentences of the while
+    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
+            kind: parser_error::ErrorType::OpenCurvyBrackedExpected ,
             line: token.line,
         };
         return Err(error);
     }
-    if token.kind!=tokens::TokenType::OCB{
+    //Checking if there is an token
+    if !there_is_a_token(token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
-            line: token.line,
-        };
-        return Err(error);
+                kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+                line: token.line,
+            };
+            return Err(error);
     }
     while *index<tokens.len()&&token.kind!=tokens::TokenType::CCB{
         match generate_node(token, tokens, index){
@@ -602,16 +455,14 @@ fn is_while(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usi
                 return Err(error);
             }
         }
-        if *index<tokens.len(){
-            node_tokens.push(tokens[*index].clone());
-            *token = tokens[*index].clone();
-        }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
+        *index-=1;
+        if !there_is_a_token(token, tokens, index, &mut node_tokens){
+            let error=parser_error::ParserError{
+                kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+                line: token.line,
+            };
+            return Err(error);
+        }
     }
     if token.kind!=tokens::TokenType::CCB{
         let error=parser_error::ParserError{
@@ -636,35 +487,21 @@ fn is_if(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize)-
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
     let mut nodes:Vec<node::Node>=Vec::new();
-    *index+=1;
-    //Checking if their is an value
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
+    //Checking if their is an open curvy bracked to start the secuence of sentences of the while
+    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
+            kind: parser_error::ErrorType::OpenCurvyBrackedExpected ,
             line: token.line,
         };
         return Err(error);
     }
-    if token.kind!=tokens::TokenType::OCB{
+    //Checking if there is an token
+    if !there_is_a_token(token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
-            line: token.line,
-        };
-        return Err(error);
+                kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+                line: token.line,
+            };
+            return Err(error);
     }
     while *index<tokens.len()&&token.kind!=tokens::TokenType::CCB{
         match generate_node(token, tokens, index){
@@ -675,16 +512,14 @@ fn is_if(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize)-
                 return Err(error);
             }
         }
-        if *index<tokens.len(){
-            node_tokens.push(tokens[*index].clone());
-            *token = tokens[*index].clone();
-        }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
+        *index-=1;
+        if !there_is_a_token(token, tokens, index, &mut node_tokens){
+            let error=parser_error::ParserError{
+                kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+                line: token.line,
+            };
+            return Err(error);
+        }
     }
     if token.kind!=tokens::TokenType::CCB{
         let error=parser_error::ParserError{
@@ -695,57 +530,45 @@ fn is_if(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize)-
     }
     node_tokens.push(tokens[*index].clone());
     let mut alternative_node:Vec<node::Node>=Vec::new();
-    if tokens[*index+1].kind==tokens::TokenType::Else{
-        *index+=1;
-    //Checking if their is an value
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::OCB{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    *index+=1;
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    while *index<tokens.len()&&token.kind!=tokens::TokenType::CCB{
-        match generate_node(token, tokens, index){
-            Ok(list)=>{
-                alternative_node.push(list);
+    *index-=1;
+    //Checking if their is an open curvy bracked to start the secuence of sentences of the while
+    if !check_if_is_token(tokens::TokenType::Else,token, tokens, index, &mut node_tokens){
+        //Checking if there is an open curvy bracket to start  lecture of instruction for the alternative path
+        if !check_if_is_token(tokens::TokenType::OCB, token, tokens, index, &mut node_tokens){
+            let error=parser_error::ParserError{
+                kind: parser_error::ErrorType::OpenCurvyBrackedExpected,
+                line: token.line,
+            };
+            return Err(error);
+        }
+        //Checking if there is an token to start the while loop
+        if !there_is_a_token(token, tokens, index, &mut node_tokens){
+            let error=parser_error::ParserError{
+                kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+                line: token.line,
+            };
+            return Err(error);
+        }
+        //While loop to get the istruction for the alternative path
+        while *index<tokens.len()&&token.kind!=tokens::TokenType::CCB{
+            match generate_node(token, tokens, index){
+                Ok(list)=>{
+                    alternative_node.push(list);
+                }
+                Err(error)=>{
+                    return Err(error);
+                }
             }
-            Err(error)=>{
+            *index-=1;
+            if !there_is_a_token(token, tokens, index, &mut node_tokens){
+                let error=parser_error::ParserError{
+                    kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
+                    line: token.line,
+                };
                 return Err(error);
             }
         }
-        if *index<tokens.len(){
-            node_tokens.push(tokens[*index].clone());
-            *token = tokens[*index].clone();
-        }else{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    }
+    //Checking if there is an close curve bracked to end the lecture correctly
     if token.kind!=tokens::TokenType::CCB{
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::CloseCurvyBrackedExpected,
@@ -768,14 +591,14 @@ if {
     code
 }]
 */
-//Function to check if their is the token we want
+//Function to check if there is the token we want
 fn check_if_is_token(kind:tokens::TokenType,token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
     if !there_is_a_token(token, tokens, index, node_tokens)&&token.kind!=kind{
         return false;
     }
     true
 }
-//Function to check if their is another token after the actual
+//Function to check if there is another token after the actual
 fn there_is_a_token(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
     *index+=1;
     if *index<tokens.len(){
@@ -786,10 +609,20 @@ fn there_is_a_token(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &
         return false;
     }
 }
-//Function to check if their is a type
-fn check_if_is_a_type(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
-    if !there_is_a_token(token, tokens, index, node_tokens)&&(token.kind!=tokens::TokenType::NumType||token.kind!=tokens::TokenType::StrType||token.kind!=tokens::TokenType::BoolType){
+//Function to check if there is a type of data
+fn there_is_a_type(kind:&mut ValueType,token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
+    if !there_is_a_token(token, tokens, index,node_tokens){
         return false;
+    }
+    //Checking if the tokens is a type of data
+    match token.kind{
+        TokenType::NumType=>*kind=ValueType::Number,
+        TokenType::StrType=>*kind=ValueType::Text,
+        TokenType::BoolType=>*kind=ValueType::Boolean,
+        TokenType::AnyType=>*kind=ValueType::Any,
+        _=>{
+            return false;
+        }
     }
     true
 }
