@@ -129,33 +129,18 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     let node: node::Node;
     let num;
     let name;
-    *index+=1;
-    //Checking if their is an identifier after the pop
-    if *index<tokens.len(){
-        node_tokens.push(tokens[*index].clone());
-        *token = tokens[*index].clone();
-    }else{
+    //Checking if their is an identifier to get where to put the value of the stack
+    if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::ValueExcepted ,
             line: token.line,
         };
         return Err(error);
     }
-    if token.kind!=tokens::TokenType::Ide{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ValueExcepted,
-            line: token.line,
-        };
-        return Err(error);
-    }
     name=token.value.clone();
-    //Checking if the sentence is closed with a semicolon, the end of the sentence
-    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
-         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::SemiColonExpected ,
-            line: token.line,
-        };
-        return Err(error);
+    //Checking if their is the identifier is for the case of an position in a array
+    if check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
+        
     }
     //Cheching case for arrays
     if token.kind!=tokens::TokenType::OBR{
@@ -801,4 +786,10 @@ fn there_is_a_token(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &
         return false;
     }
 }
-//A
+//Function to check if their is a type
+fn check_if_is_a_type(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
+    if !there_is_a_token(token, tokens, index, node_tokens)&&(token.kind!=tokens::TokenType::NumType||token.kind!=tokens::TokenType::StrType||token.kind!=tokens::TokenType::BoolType){
+        return false;
+    }
+    true
+}
