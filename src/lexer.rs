@@ -1,112 +1,58 @@
 use crate::tokens;
 use crate::lexer_error;
 
-pub fn tokenize(code: String) -> Result<Vec<tokens::Token>, lexer_error::LexerError>{
-    let mut token_list: Vec<tokens::Token>=Vec::new();
-    let caracteres: Vec<char> = code.chars().collect();
-    let mut index=0;
-    let mut _line=1;
-    let mut caracter;
-    let mut name: String;
-    while index<caracteres.len(){
-        caracter=caracteres[index];
-        if is_invalid_caracter(caracter){
-            let error=lexer_error::LexerError{
-                kind: lexer_error::ErrorType::InvalidCharacter,
-                line: _line
-            };
-            return Err(error);
+pub fn tokenize(code: String) -> Result<Vec<tokens::Token>, lexer_error::LexerError> {
+    let mut token_list = Vec::new();
+    let chars: Vec<char> = code.chars().collect();
+    let mut index = 0;
+    let mut line = 1;
+
+    while index < chars.len() {
+        let c = chars[index];
+        if c == '\n' { line += 1; index += 1; continue; }
+        if c == ' ' || c == '\r' || c == '\t' { index += 1; continue; }
+        if is_invalid_caracter(c) {
+            return Err(lexer_error::LexerError {
+                kind: lexer_error::ErrorType::InvalidCharacter, line });
         }
-        while is_useless(&caracter, &mut _line,){
-            index+=1;
-            if index<caracteres.len(){
-                caracter=caracteres[index];
-            }
+        if is_special_caracter(c, &mut token_list, line) { index += 1; continue; }
+        if is_comentery(c) {
+            while index < chars.len() && chars[index] != '\n' { index += 1; }
+            continue;
         }
-        if is_special_caracter(caracter, &mut token_list,_line){
+        if c == '"' {
+            let start_line = line;
             index += 1;
-            continue;
-        }
-        if is_comentery(caracter){
-            while index<caracteres.len()&&caracter!='\n'{
-                index+=1;
-                if index<caracteres.len(){
-                    caracter=caracteres[index];
-                }
-            }
-            if caracter=='\n'{
-                _line+=1;
-            }
-            index+=1;
-            continue;
-        }
-        if caracter=='\"'{
-            index+=1;
-            if index<caracteres.len(){
-                caracter=caracteres[index];
-            }
-            name=String::from("");
-            while index<caracteres.len()&&caracter!='\"'{
-                if caracter=='\n'{
-                    _line+=1;
-                }
-                name.push(caracter);
-                index+=1;
-                if index<caracteres.len(){
-                    caracter=caracteres[index];
-                }
-            }
-            if caracter=='\"'{
-                let token=tokens::Token{
-                    kind:tokens::TokenType::Str,
-                    line:_line,
-                    value:name,
-                };
-                token_list.push(token);
+            let mut name = String::new();
+            while index < chars.len() && chars[index] != '"' {
+                if chars[index] == '\n' { line += 1; }
+                name.push(chars[index]);
                 index += 1;
-                continue;
             }
-            else{
-                let error=lexer_error::LexerError{
-                    kind: lexer_error::ErrorType::UnclosedString,
-                    line: _line
-                };
-                return Err(error);
+            if index >= chars.len() {
+                return Err(lexer_error::LexerError {
+                    kind: lexer_error::ErrorType::UnclosedString, line: start_line });
             }
+            index += 1; // cerrar comilla
+            token_list.push(tokens::Token {
+                kind: tokens::TokenType::Str, line: start_line, value: name });
+            continue;
         }
-        else{
-            name=String::from("");
-            while index<caracteres.len()&&!is_useless(&caracter, &mut _line){
-                name.push(caracter);
-                index+=1;
-                if index<caracteres.len(){
-                    caracter=caracteres[index];
-                }
-            }
-                if is_number(&mut token_list,&name, _line){
-                    continue;
-                }
-                if is_keyword(&mut token_list,&name, _line){
-                    continue;
-                }
-                if !contains_invalid_caracter(&name){
-                    let token=tokens::Token{
-                        kind: tokens::TokenType::Ide,
-                        line: _line,
-                        value: name.clone(),
-                    };
-                    token_list.push(token);
-                }
-                else{
-                    let error=lexer_error::LexerError{
-                        kind: lexer_error::ErrorType::InvalidIndentifier,
-                        line: _line
-                    };
-                    return Err(error);
-                }
+        let mut name = String::new();
+        while index < chars.len() && !is_delimiter(chars[index]) {
+            name.push(chars[index]);
+            index += 1;
         }
+        if is_number(&mut token_list, &name, line) { continue; }
+        if is_keyword(&mut token_list, &name, line) { continue; }
+        if contains_invalid_caracter(&name) {
+            return Err(lexer_error::LexerError {
+                kind: lexer_error::ErrorType::InvalidIndentifier, line });
+        }
+        token_list.push(tokens::Token {
+            kind: tokens::TokenType::Ide, line, value: name });
     }
-    return Ok(token_list);
+    Ok(token_list)
 }
 fn is_special_caracter(caracter: char,list: &mut Vec<tokens::Token>,_line: usize)->bool{
     let token_kind=match caracter{
@@ -130,21 +76,6 @@ fn is_special_caracter(caracter: char,list: &mut Vec<tokens::Token>,_line: usize
     };
     list.push(token);
     return true;
-}
-fn is_useless(car:&char,lin:&mut usize)->bool{
-    match *car{
-        ' '|'\r'=>{
-            return true;
-        },
-        '\t'=>{
-            return true;
-        },
-        '\n'=>{
-            *lin+=1;
-            return true;
-        }
-        _=>return false,
-    }
 }
 fn is_comentery(car: char)->bool{
     return car=='#';
@@ -189,9 +120,9 @@ fn is_keyword(list: &mut Vec<tokens::Token>,text: &String,_line: usize)->bool{
         "and"=>token_kind=tokens::TokenType::And,
         "or"=>token_kind=tokens::TokenType::Or,
         "not"=>token_kind=tokens::TokenType::Not,
-        "True"=>token_kind=tokens::TokenType::True,
-        "False"=>token_kind=tokens::TokenType::False,
-        "Null"=>token_kind=tokens::TokenType::Null,
+        "true"=>token_kind=tokens::TokenType::True,
+        "false"=>token_kind=tokens::TokenType::False,
+        "null"=>token_kind=tokens::TokenType::Null,
         "num"=>token_kind=tokens::TokenType::NumType,
         "bool"=>token_kind=tokens::TokenType::BoolType,
         "str"=>token_kind=tokens::TokenType::StrType,
@@ -225,4 +156,8 @@ fn contains_invalid_caracter(ide: &String)->bool{
         }
     }
     false
+}
+fn is_delimiter(c: char) -> bool {
+    c.is_whitespace()
+        || matches!(c, '(' | ')' | '{' | '}' | '[' | ']' | ';' | ':' | '"' | '#')
 }

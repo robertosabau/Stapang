@@ -201,7 +201,7 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
             node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Boolean, value: String::from("Flase") }}
         },
         tokens::TokenType::Num=>{
-            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Boolean,value:token.value.clone()}}
+            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Number,value:token.value.clone()}}
         }
         tokens::TokenType::Ide=>{
             //Checking if there is the identifier is for an array
@@ -338,7 +338,6 @@ fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
     let value:value::Value;
-    *index+=1;
     //Checking if their is an value
     if !there_is_a_token(token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
