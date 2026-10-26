@@ -1,0 +1,95 @@
+use crate::{node, variable,value};
+use std::collections::HashMap;
+
+//Function to start the evaluation
+pub fn evaluation(nodes:Vec<node::Node>){
+    //Checking if there is an save instruction
+    if nodes.iter().any(|n| matches!(n.kind, node::NodeType::SaveNode { .. })) {
+        //Warning to advice that during the execution of the program the save mode is changed
+        println!("WARNING: Save mode will change during execution. Results may be unpredictable and errors harder to trace.");
+    }
+    evaluate_node(nodes);
+}
+//Function to send the node where it has to go
+fn evaluate_node(nodes:Vec<node::Node>){
+    //HashMap for the variable
+    let mut variables: HashMap<String, variable::Variable> = HashMap::new();
+    //The stack of the system
+    let mut stack:Vec<value::Value>=Vec::new();
+    //Boolean for the save_mode
+    let mut save_mode:bool=true;
+    //For to pass around every node
+    for node in nodes{
+        match node.kind{
+            node::NodeType::AddNode=>{
+
+            }
+            node::NodeType::AndNode=>{
+                
+            }
+            node::NodeType::ArrNode { .. }=>{
+
+            }
+            node::NodeType::BigEquNode=>{
+                
+            }
+            node::NodeType::BigNode=>{
+
+            }
+            node::NodeType::DivNode=>{
+                
+            }
+            node::NodeType::EquNode=>{
+
+            }
+            node::NodeType::LowEquNode=>{
+                
+            }
+            node::NodeType::VoidNode=>{
+
+            }
+            node::NodeType::Popnode { .. } =>{
+
+            }
+            node::NodeType::Pushnode { ..} =>{
+
+            }
+            node::NodeType::PrintNode =>{
+
+            },
+            node::NodeType::IfNode { .. } =>{
+
+            }
+            node::NodeType::WhileNode { .. } => {
+
+            }
+            node::NodeType::VarNode { .. } => {
+
+            }
+            node::NodeType::SaveNode { .. } =>{
+
+            }
+            node::NodeType::ReadNode => {
+
+            }
+            node::NodeType::SubNode => {
+
+            }
+            node::NodeType::MultNode => {
+
+            }
+            node::NodeType::ModNode => {
+                
+            }
+            node::NodeType::LowNode => {
+                
+            }
+            node::NodeType::NotNode => {
+                
+            }
+            node::NodeType::OrNode => {
+                
+            }
+        }
+    }
+}

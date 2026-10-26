@@ -54,5 +54,4 @@ pub enum TokenType{
     CBR, //Close Bracket
     COL, //Colon
     EOL, // End of Line
-    EOC, //End of Code
 }

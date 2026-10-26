@@ -106,12 +106,6 @@ pub fn tokenize(code: String) -> Result<Vec<tokens::Token>, lexer_error::LexerEr
                 }
         }
     }
-    let token=tokens::Token{
-        kind: tokens::TokenType::EOC,
-        line: _line,
-        value: String::from(""),
-    };
-    token_list.push(token);
     return Ok(token_list);
 }
 fn is_special_caracter(caracter: char,list: &mut Vec<tokens::Token>,_line: usize)->bool{

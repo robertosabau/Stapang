@@ -11,6 +11,7 @@ mod parser;
 mod parser_error;
 mod value;
 mod variable;
+mod evaluator;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -28,7 +29,7 @@ fn main() {
             Ok(tokens)=>{
                 match parser::parsing(tokens){
                     Ok(_nodes)=>{
-
+                        evaluator::evaluation(_nodes);
                     },
                     Err(problem)=>{
                         show_parser_error(problem);
