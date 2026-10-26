@@ -66,8 +66,10 @@ fn evaluate_node(nodes:Vec<node::Node>){
             node::NodeType::VarNode { .. } => {
 
             }
-            node::NodeType::SaveNode { .. } =>{
+            node::NodeType::SaveNode { value } =>{
+                if !save_traitment(&value, &mut save_mode){
 
+                }
             }
             node::NodeType::ReadNode => {
 
@@ -92,4 +94,17 @@ fn evaluate_node(nodes:Vec<node::Node>){
             }
         }
     }
+}
+//Function to make the traitment of the save instruction
+fn save_traitment(value:&value::Value,mode:&mut bool)->bool{
+    match value.value.as_str(){
+        "True"=>{
+            *mode=true;
+        }
+        "False"=>{
+            *mode=false;
+        }
+        _=> return false
+    }
+    true
 }

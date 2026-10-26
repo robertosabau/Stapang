@@ -657,6 +657,8 @@ fn is_if(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize)-
         };
         return Err(error);
     }
+    }else{
+        alternative_node.push(node::Node{kind:node::NodeType::VoidNode,tokens:node_tokens.clone()})
     }
     node=node::Node {
         kind: node::NodeType::IfNode { instructions: nodes, else_instructions: alternative_node }, 
