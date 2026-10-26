@@ -47,8 +47,6 @@ fn main() {
             std::process::exit(1);
         }
     }
-
-    println!("Hello, world!");
 }
 
 fn show_lexer_error(error:LexerError){
