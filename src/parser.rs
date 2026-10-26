@@ -318,7 +318,7 @@ fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     //Checking if there is an colon to enter the type of the variable
     if !check_if_is_token(tokens::TokenType::COL,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ValueExcepted ,
+            kind: parser_error::ErrorType::ColonExpected ,
             line: token.line,
         };
         return Err(error);
@@ -394,7 +394,7 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     //Checking if there is an colon to enter the type of the variable
     if !check_if_is_token(tokens::TokenType::COL,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ValueExcepted ,
+            kind: parser_error::ErrorType::ColonExpected ,
             line: token.line,
         };
         return Err(error);
