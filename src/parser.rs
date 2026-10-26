@@ -4,7 +4,7 @@ use crate::parser_error;
 use crate::tokens::TokenType;
 use crate::value;
 use crate::value::ValueType;
-
+//Funtion to start the parsing
 pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error::ParserError>{
     let mut node_list:Vec<node::Node>=Vec::new();
     let mut index=0;
@@ -22,7 +22,7 @@ pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error
     }
     Ok(node_list)
 }
-
+//Function to generate a node for instructions
 fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     match token.kind{
             tokens::TokenType::Pop=>{
@@ -37,6 +37,15 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
                 }
             },
             tokens::TokenType::Push=>{
+                match is_push(&mut token,&tokens,&mut index){
+                    Ok(node)=>{
+                        *index+=1;
+                        return Ok(node);
+                    },
+                    Err(error)=>{
+                        return Err(error);
+                    }
+                }
             },
             tokens::TokenType::Print | tokens::TokenType::Read | tokens::TokenType::Add 
             | tokens::TokenType::Sub | tokens::TokenType::Mult | tokens::TokenType::Div
@@ -116,14 +125,8 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
                 return Err(error);
             }
         };
-    let node=node::Node{
-        kind: node::NodeType::VoidNode,
-        tokens: Vec::new()
-    };
-    *index+=1;
-    Ok(node)
 }
-
+//Function to detect an pop
 fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
@@ -177,6 +180,83 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
 pop name;
 pop name[number];
 */
+fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
+    let mut node_tokens:Vec<tokens::Token>=Vec::new();
+    let node: node::NodeType;
+    let final_node:node::Node;
+    //Checking if there is an value to push
+    if !there_is_a_value(token, tokens, index, &mut node_tokens){
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::ValueExcepted,
+            line:token.line,
+        };
+        return Err(error);
+    }
+    *index-=1;
+    //Match to know which value we have
+    match token.kind{
+        tokens::TokenType::True =>{
+            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Boolean, value: String::from("True") }}}
+        tokens::TokenType::False =>{
+            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Boolean, value: String::from("Flase") }}
+        },
+        tokens::TokenType::Num=>{
+            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Boolean,value:token.value.clone()}}
+        }
+        tokens::TokenType::Ide=>{
+            //Checking if there is the identifier is for an array
+            if check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
+                //Checking if there is the number of the position in the array
+                if !check_if_is_token(tokens::TokenType::Num,token,tokens,index,&mut node_tokens){
+                    let error=parser_error::ParserError{
+                        kind: parser_error::ErrorType::NumberExpected,
+                        line: token.line,
+                    };
+                    return Err(error);
+                }
+                let num=token.value.clone();
+                //Checking if there is the closing bracked
+                if !check_if_is_token(tokens::TokenType::CBR,token,tokens,index,&mut node_tokens){
+                    let error=parser_error::ParserError{
+                        kind: parser_error::ErrorType::CloseBrakectExpected,
+                        line: token.line,
+                    };
+                    return Err(error);
+                }
+                node=node::NodeType::Pushnode { array: true, name:token.value.clone(), position:num.parse::<usize>().ok(), value:value::Value { kind:ValueType::Null,value:String::from("Null")}}
+            }
+            else{
+                *index-=1;
+                node=node::NodeType::Pushnode { array: false, name:token.value.clone(), position:Some(0), value:value::Value { kind:ValueType::Null,value:String::from("Null")}}
+            }
+        }
+        _=>{
+            let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::ValueExcepted,
+            line:token.line,
+        };
+            return Err(error);
+        }
+    }
+    //Checking if the sentence is closed with a semicolon, the end of the sentence
+    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
+         let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::SemiColonExpected ,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    final_node=node::Node { kind:node, tokens: node_tokens };
+    Ok(final_node)
+}
+/*
+push bool;
+push name;
+push name[number];
+push number;
+push String;
+*/
+//Function for all the instruction without parameters
 fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
@@ -189,6 +269,7 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
         };
         return Err(error);
     }
+    //Match to get witch instruction we have
     match *kind{
         tokens::TokenType::Print=>{
             node_kind=node::NodeType::PrintNode;
@@ -625,4 +706,15 @@ fn there_is_a_type(kind:&mut ValueType,token:&mut tokens::Token,tokens:&Vec<toke
         }
     }
     true
+}
+//Function to check if there is an value to push
+fn there_is_a_value(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
+    if !there_is_a_token(token, tokens, index,node_tokens){
+        return false;
+    }
+    //Checking if the tokens is a value can you get
+    match token.kind{
+        TokenType::Num|TokenType::Ide|TokenType::True|TokenType::False|TokenType::Str=>return true,
+        _=>return false,
+    }
 }
