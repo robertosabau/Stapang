@@ -1,17 +1,24 @@
-use crate::{node, variable,value};
+use crate::{evaluator_error, node, value, variable};
 use std::collections::HashMap;
 
 //Function to start the evaluation
-pub fn evaluation(nodes:Vec<node::Node>){
+pub fn evaluation(nodes:Vec<node::Node>)->Result<bool, evaluator_error::EvaluatorError>{
     //Checking if there is an save instruction
     if nodes.iter().any(|n| matches!(n.kind, node::NodeType::SaveNode { .. })) {
         //Warning to advice that during the execution of the program the save mode is changed
         println!("WARNING: Save mode will change during execution. Results may be unpredictable and errors harder to trace.");
     }
-    evaluate_node(nodes);
+    match evaluate_node(nodes){
+        Ok(boolean)=>{
+            return Ok(boolean);
+        }
+        Err(error)=>{
+            return Err(error);
+        }
+    }
 }
 //Function to send the node where it has to go
-fn evaluate_node(nodes:Vec<node::Node>){
+fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::EvaluatorError>{
     //HashMap for the variable
     let mut variables: HashMap<String, variable::Variable> = HashMap::new();
     //The stack of the system
@@ -68,7 +75,11 @@ fn evaluate_node(nodes:Vec<node::Node>){
             }
             node::NodeType::SaveNode { value } =>{
                 if !save_traitment(&value, &mut save_mode){
-
+                    let error=evaluator_error::EvaluatorError{
+                        kind:evaluator_error::ErrorType::BooleanExpected,
+                        line: node.tokens[0].line,
+                    };
+                    return Err(error);
                 }
             }
             node::NodeType::ReadNode => {
@@ -94,6 +105,7 @@ fn evaluate_node(nodes:Vec<node::Node>){
             }
         }
     }
+    Ok(true)
 }
 //Function to make the traitment of the save instruction
 fn save_traitment(value:&value::Value,mode:&mut bool)->bool{

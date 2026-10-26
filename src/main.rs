@@ -12,6 +12,7 @@ mod parser_error;
 mod value;
 mod variable;
 mod evaluator;
+mod evaluator_error;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
