@@ -53,7 +53,7 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
                 
             }
             node::NodeType::VoidNode=>{
-
+                return Ok(false);
             }
             node::NodeType::Popnode { .. } =>{
 
