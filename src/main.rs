@@ -13,6 +13,7 @@ mod value;
 mod variable;
 mod evaluator;
 mod evaluator_error;
+mod array;
 
 fn main() {
     let args: Vec<String> = env::args().collect();

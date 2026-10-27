@@ -1,4 +1,4 @@
-use crate::{evaluator_error, node, value, variable};
+use crate::{evaluator_error, node, value, variable,array};
 use std::collections::HashMap;
 
 //Function to start the evaluation
@@ -21,6 +21,8 @@ pub fn evaluation(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluato
 fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::EvaluatorError>{
     //HashMap for the variable
     let mut variables: HashMap<String, variable::Variable> = HashMap::new();
+    //HashMap for the arrays
+    let mut arrays:HashMap<String,array::Array>=HashMap::new();
     //The stack of the system
     let mut stack:Vec<value::Value>=Vec::new();
     //Boolean for the save_mode
@@ -130,21 +132,31 @@ fn save_traitment(value:&value::Value,mode:&mut bool)->bool{
 //Function to make the traitment of the print instruction
 fn print_traitment(stack:&mut Vec<value::Value>,mode:&bool)->bool{
     //Pop of the stack
-    let mut value=stack.pop();
-    //Checking if the stack was empty and was returned a None
-    match value{
-        Some(_)=>{
-        }
-        None=>{
-            //Checking if the save mode is on
-            if *mode{
+    let value = match stack.pop() {
+        Some(value) => value,
+        None => {
+            // Checking if the safe mode is on
+            if *mode {
                 return false;
             }
-            //Getting an "error" value for the save mode off
-            value=Some(value::Value{kind:value::ValueType::Null,value:String::from("Null")});
+            // Getting a "Null" value for the safe mode off
+            value::Value {
+                kind: value::ValueType::Null,
+                value: String::from("null"),
+            }
         }
-    }
+    };
     //Printing the value that was in ther first position of the stack
-    print!("{}",value.unwrap().value.as_str());
+    print!("{}",value.value.as_str());
+    true
+}
+//Function to make the traitment of the push value
+fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType)->bool{
+    if let node::NodeType::Pushnode {array,name,position,value,} = node {
+
+    }
+    else{
+        return false;
+    }
     true
 }
