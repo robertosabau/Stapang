@@ -62,7 +62,13 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
 
             }
             node::NodeType::PrintNode =>{
-
+                if !print_traitment(&mut stack, &save_mode){
+                    let error=evaluator_error::EvaluatorError{
+                        kind:evaluator_error::ErrorType::StackEmpty,
+                        line:node.tokens[0].line,
+                    };
+                    return Err(error);
+                }
             },
             node::NodeType::IfNode { .. } =>{
 
@@ -109,6 +115,7 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
 }
 //Function to make the traitment of the save instruction
 fn save_traitment(value:&value::Value,mode:&mut bool)->bool{
+    //Cases for the value intruduced
     match value.value.as_str(){
         "True"=>{
             *mode=true;
@@ -118,5 +125,26 @@ fn save_traitment(value:&value::Value,mode:&mut bool)->bool{
         }
         _=> return false
     }
+    true
+}
+//Function to make the traitment of the print instruction
+fn print_traitment(stack:&mut Vec<value::Value>,mode:&bool)->bool{
+    //Pop of the stack
+    let mut value=stack.pop();
+    //Checking if the stack was empty and was returned a None
+    match value{
+        Some(_)=>{
+        }
+        None=>{
+            //Checking if the save mode is on
+            if *mode{
+                return false;
+            }
+            //Getting an "error" value for the save mode off
+            value=Some(value::Value{kind:value::ValueType::Null,value:String::from("Null")});
+        }
+    }
+    //Printing the value that was in ther first position of the stack
+    print!("{}",value.unwrap().value.as_str());
     true
 }
