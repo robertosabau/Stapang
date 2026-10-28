@@ -6,7 +6,7 @@ pub struct Variable{
 }
 impl Variable{
     //Constructor of a Variable
-    fn new(name:String,kind:value::ValueType)->Self{
+    pub fn new(name:String,kind:value::ValueType)->Self{
         Self { 
             identifier:name,
             kind,
@@ -14,14 +14,14 @@ impl Variable{
         }
     }
     //Function to set the value in a save way
-    fn set_value(&mut self,value:value::Value)->bool{
+    pub fn set_value(&mut self,value:value::Value)->bool{
         match value.kind{
             value::ValueType::Null=>{
                 self.value=value;
                 return true;
             }
             _=>{
-                if self.value.kind==value::ValueType::Any||self.value.kind==value.kind{
+                if self.kind==value::ValueType::Any||self.kind==value.kind{
                     self.value=value;
                     return true;
                 }
@@ -30,7 +30,7 @@ impl Variable{
         }
     }
     //Function to get the value
-    fn get_value(&self)->value::Value{
+    pub fn get_value(&self)->value::Value{
         self.value.clone()
     }
 }

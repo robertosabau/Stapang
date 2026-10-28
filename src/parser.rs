@@ -192,7 +192,6 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
         };
         return Err(error);
     }
-    *index-=1;
     //Match to know which value we have
     match token.kind{
         tokens::TokenType::True =>{
@@ -202,6 +201,9 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
         },
         tokens::TokenType::Num=>{
             node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Number,value:token.value.clone()}}
+        }
+        tokens::TokenType::Str=>{
+            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Text,value:token.value.clone()}}
         }
         tokens::TokenType::Ide=>{
             //Checking if there is the identifier is for an array
@@ -675,7 +677,7 @@ if {
 */
 //Function to check if there is the token we want
 fn check_if_is_token(kind:tokens::TokenType,token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
-    if !there_is_a_token(token, tokens, index, node_tokens)&&token.kind!=kind{
+    if !there_is_a_token(token, tokens, index, node_tokens)||token.kind!=kind{
         return false;
     }
     true

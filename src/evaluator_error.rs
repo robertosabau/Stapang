@@ -5,4 +5,8 @@ pub struct EvaluatorError{
 pub enum ErrorType{
     BooleanExpected,
     StackEmpty,
+    VariableNotDefined{name:String},
+    ArrayNotDefined{name:String},
+    InternarError,
+    OutOfBound,
 }

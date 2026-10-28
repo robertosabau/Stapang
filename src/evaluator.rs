@@ -1,4 +1,4 @@
-use crate::{evaluator_error, node, value, variable,array};
+use crate::{array, evaluator_error::{self, ErrorType::InternarError, EvaluatorError}, node, value, variable};
 use std::collections::HashMap;
 
 //Function to start the evaluation
@@ -60,8 +60,41 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
             node::NodeType::Popnode { .. } =>{
 
             }
-            node::NodeType::Pushnode { ..} =>{
-
+            node::NodeType::Pushnode {ref name, ..} =>{
+                match push_traitment(&mut stack, &save_mode, &node.kind, &variables, &arrays){
+                    0=>{
+                    },
+                    1=>{
+                        let error=evaluator_error::EvaluatorError{
+                            kind:evaluator_error::ErrorType::InternarError,
+                            line:node.tokens[0].line,
+                        };
+                        return Err(error);
+                    }
+                    2=>{
+                        let error=evaluator_error::EvaluatorError{
+                            kind:evaluator_error::ErrorType::VariableNotDefined{name:name.clone()},
+                            line:node.tokens[0].line,
+                        };
+                        return Err(error);
+                    }
+                    3=>{
+                        let error=evaluator_error::EvaluatorError{
+                            kind:evaluator_error::ErrorType::ArrayNotDefined {name:name.clone()},
+                            line:node.tokens[0].line,
+                        };
+                        return Err(error);
+                    }
+                    4=>{
+                        let error=evaluator_error::EvaluatorError{
+                            kind:evaluator_error::ErrorType::OutOfBound,
+                            line:node.tokens[0].line,
+                        };
+                        return Err(error);
+                    }
+                    _=>{
+                    }
+                }
             }
             node::NodeType::PrintNode =>{
                 if !print_traitment(&mut stack, &save_mode){
@@ -142,7 +175,7 @@ fn print_traitment(stack:&mut Vec<value::Value>,mode:&bool)->bool{
             // Getting a "Null" value for the safe mode off
             value::Value {
                 kind: value::ValueType::Null,
-                value: String::from("null"),
+                value: String::from("Null"),
             }
         }
     };
@@ -151,12 +184,67 @@ fn print_traitment(stack:&mut Vec<value::Value>,mode:&bool)->bool{
     true
 }
 //Function to make the traitment of the push value
-fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType)->bool{
+fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,variables:&HashMap<String, variable::Variable>,arrays:&HashMap<String, array::Array>)->u8{
+    //Checking if we have entered with the correct node to get the atributes
     if let node::NodeType::Pushnode {array,name,position,value,} = node {
+        //Checking if a value, which is assigned to name de String "Null"
+        if *name==String::from("Null"){
+            //Push the value directly
+            stack.push(value.clone());
+            //Code for ok status
+            return 0;
+            
+        }
+        //Checking if is an Array
+        if *array==true{
+            //Checking if the array was defined
+            if !arrays.contains_key(name){
+                //Checking if the save mode is on
+                if *mode{
+                    //Code for array do not found
+                    return 3;
+                }
+                //Pushing a null value
+                stack.push(value::Value { kind: value::ValueType::Null, value:String::from("Null")});
+                //Code for ok status
+                return 0;
+            }
+            if let Some(array) = arrays.get(name) {
+                match array.get_value(position.unwrap()){
+                    Ok(value)=>{
+                        stack.push(value);
+                        //Code for ok status
+                        return 0;
+                    }
+                    Err(_code)=>{
+                        //Code for out of bounds error
+                        return 4;
+                    }
+                }
+            }
 
+        }
+        //Continue in case there is only a variable, checking if the variable is defined
+        if !variables.contains_key(name){
+            //Checking if the save mode is on
+            if *mode{
+                //Code for variable do not found
+                return 2;
+            }
+            stack.push(value::Value { kind: value::ValueType::Null, value:String::from("Null")});
+            //Code for ok status
+            return 0;
+        }
+        //Push the value in the variable in the stack
+        if let Some(variable) = variables.get(name) {
+            stack.push(variable.get_value());
+        }
+        //Code for ok status
+        return 0;
     }
+    //return error (It's not supossed to happend, but just in case)
     else{
-        return false;
+        //Code for internar error
+        return 1;
     }
-    true
 }
