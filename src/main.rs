@@ -1,6 +1,6 @@
 use std::env;
 use std::fs;
-
+use std::time::Instant;
 use crate::lexer_error::LexerError;
 use crate::parser_error::ParserError;
 mod tokens;
@@ -17,6 +17,15 @@ mod array;
 mod calculator;
 
 fn main() {
+    /*
+    Timer for check the time to make an instruction
+    let start = Instant::now();
+    let mut sum: u64 = 0;
+    for i in 0..1000000 {
+        sum += i;
+    }
+    let duration = start.elapsed();
+    */
     let args: Vec<String> = env::args().collect();
 
     if args.len()<2{
@@ -50,6 +59,7 @@ fn main() {
             std::process::exit(1);
         }
     }
+    //println!("Execution time: {} ns", duration.as_nanos()); // To check the time to make an code
 }
 
 fn show_lexer_error(error:LexerError){
