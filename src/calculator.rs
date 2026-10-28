@@ -89,6 +89,6 @@ pub fn module(val1:value::Value,val2:value::Value,mode:&bool)->Result<value::Val
 //Function to check if the type is correct for matematical operation
 fn checking_type_matematical_operation(type1:&value::ValueType,type2:&value::ValueType,string_allowed:bool)->bool{
     matches!(*type1, value::ValueType::Null | value::ValueType::Boolean)
-    || matches!(*type2, value::ValueType::Null | value::ValueType::Boolean)||(matches!(*type1, value::ValueType::Text)
-    || matches!(*type2, value::ValueType::Text)&&!string_allowed)
+    || matches!(*type2, value::ValueType::Null | value::ValueType::Boolean)
+    || (matches!(*type1, value::ValueType::Text)|| matches!(*type2, value::ValueType::Text)) && !string_allowed
 }
