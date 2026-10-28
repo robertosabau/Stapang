@@ -25,9 +25,33 @@ pub fn tokenize(code: String) -> Result<Vec<tokens::Token>, lexer_error::LexerEr
             index += 1;
             let mut name = String::new();
             while index < chars.len() && chars[index] != '"' {
-                if chars[index] == '\n' { line += 1; }
-                name.push(chars[index]);
-                index += 1;
+                if chars[index] == '\\' {
+                    index += 1;
+
+                    if index >= chars.len() {
+                        return Err(lexer_error::LexerError {
+                            kind: lexer_error::ErrorType::UnclosedString,
+                            line: start_line,
+                        });
+                    }
+
+                    match chars[index] {
+                        'n' => name.push('\n'),
+                        't' => name.push('\t'),
+                        '"' => name.push('"'),
+                        '\\' => name.push('\\'),
+                        other => {
+                            name.push('\\');
+                            name.push(other);
+                        }
+                    }
+                    index+=1;
+                }
+                else{
+                    if chars[index] == '\n' { line += 1; }
+                    name.push(chars[index]);
+                    index += 1;
+                }
             }
             if index >= chars.len() {
                 return Err(lexer_error::LexerError {
