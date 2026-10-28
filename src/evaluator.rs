@@ -249,7 +249,7 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
     }
 }
 //Function to treat an operation
-pub fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool)->u8{
+pub fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:node::NodeType)->u8{
     
     0
 }
