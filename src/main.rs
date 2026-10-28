@@ -14,6 +14,7 @@ mod variable;
 mod evaluator;
 mod evaluator_error;
 mod array;
+mod calculator;
 
 fn main() {
     let args: Vec<String> = env::args().collect();

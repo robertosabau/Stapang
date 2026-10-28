@@ -248,3 +248,8 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
         return 1;
     }
 }
+//Function to treat an operation
+pub fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool)->u8{
+    
+    0
+}
