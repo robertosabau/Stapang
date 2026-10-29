@@ -138,7 +138,7 @@ pub fn not(val1:&value::Value)->Result<value::Value,bool>{
     else{
         return Ok(value::Value{
             kind:value::ValueType::Boolean,
-            value: String::from("Treu")
+            value: String::from("True")
         });
     }
 }
@@ -176,7 +176,7 @@ pub fn greater(val1:&value::Value,val2:&value::Value)->Result<value::Value,bool>
         true=>String::from("True"),
         false=>String::from("False"),
     };
-    Ok(value::Value { kind: value::ValueType::Boolean, value: value_result.clone()})
+    Ok(value::Value { kind: value::ValueType::Boolean, value: value_result})
 }
 //Function to make lower
 pub fn lower(val1:&value::Value,val2:&value::Value)->Result<value::Value,bool>{
@@ -188,13 +188,49 @@ pub fn lower(val1:&value::Value,val2:&value::Value)->Result<value::Value,bool>{
         result=val1.value.parse::<f64>().unwrap()<val2.value.parse::<f64>().unwrap();
     }
     else{
-        result=*val1.value>*val2.value;
+        result=*val1.value<*val2.value;
     }
     let value_result=match result{
         true=>String::from("True"),
         false=>String::from("False"),
     };
-    Ok(value::Value { kind: value::ValueType::Boolean, value: value_result.clone()})
+    Ok(value::Value { kind: value::ValueType::Boolean, value: value_result})
+}
+//Function to make greator or equal
+pub fn greater_equal(val1:&value::Value,val2:&value::Value)->Result<value::Value,bool>{
+    if !checking_type_logical_operation(&val1.kind,&val2.kind,false){
+        return Err(false);
+    }
+    let result;
+    if val1.kind==value::ValueType::Number{
+        result=val1.value.parse::<f64>().unwrap()>=val2.value.parse::<f64>().unwrap();
+    }
+    else{
+        result=*val1.value>=*val2.value;
+    }
+    let value_result=match result{
+        true=>String::from("True"),
+        false=>String::from("False"),
+    };
+    Ok(value::Value { kind: value::ValueType::Boolean, value: value_result})
+}
+//Function to make lower or equal
+pub fn lower_equal(val1:&value::Value,val2:&value::Value)->Result<value::Value,bool>{
+    if !checking_type_logical_operation(&val1.kind,&val2.kind,false){
+        return Err(false);
+    }
+    let result;
+    if val1.kind==value::ValueType::Number{
+        result=val1.value.parse::<f64>().unwrap()<=val2.value.parse::<f64>().unwrap();
+    }
+    else{
+        result=*val1.value<=*val2.value;
+    }
+    let value_result=match result{
+        true=>String::from("True"),
+        false=>String::from("False"),
+    };
+    Ok(value::Value { kind: value::ValueType::Boolean, value: value_result})
 }
 //Function to check if the type is correct for matematical operation
 fn checking_type_matematical_operation(type1:&value::ValueType,type2:&value::ValueType,string_allowed:bool)->bool{
