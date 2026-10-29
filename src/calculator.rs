@@ -142,6 +142,18 @@ pub fn not(val1:value::Value)->Result<value::Value,bool>{
         });
     }
 }
+//Function to make equals
+pub fn equals(val1:value::Value,val2:value::Value)->Result<value::Value,bool>{
+    if !checking_type_logical_operation(&val1.kind,&val2.kind,false){
+        return Err(false);
+    }
+    let result=val1.value==val2.value;
+    let value_result=match result{
+        true=>String::from("True"),
+        false=>String::from("False"),
+    };
+    Ok(value::Value { kind: value::ValueType::Boolean, value: value_result.clone()})
+}
 //Function to check if the type is correct for matematical operation
 fn checking_type_matematical_operation(type1:&value::ValueType,type2:&value::ValueType,string_allowed:bool)->bool{
     !(matches!(*type1, value::ValueType::Null | value::ValueType::Boolean)
@@ -155,7 +167,7 @@ fn checking_type_logical_operation(type1:&value::ValueType,type2:&value::ValueTy
         true=>{
             return matches!(*type1,value::ValueType::Boolean)&&matches!(*type2,value::ValueType::Boolean);
         }
-        //Case for comparators
+        //Case for comparators, where they have to be the type of value
         false=>{
             return *type1 == *type2
                 && matches!(
