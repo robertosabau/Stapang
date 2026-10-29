@@ -58,7 +58,7 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
             node::NodeType::Popnode { .. } =>{
 
             }
-            node::NodeType::Pushnode {ref name, ..} =>{
+            node::NodeType::Pushnode { ..} =>{
                 match push_traitment(&mut stack, &save_mode, &node.kind, &variables, &arrays){
                     Ok(_) => continue,
                     Err(error) => {
