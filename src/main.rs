@@ -1,6 +1,6 @@
 use std::env;
 use std::fs;
-use std::time::Instant;
+//use std::time::Instant;
 use crate::lexer_error::LexerError;
 use crate::parser_error::ParserError;
 mod tokens;

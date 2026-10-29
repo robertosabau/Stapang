@@ -60,37 +60,13 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
             }
             node::NodeType::Pushnode {ref name, ..} =>{
                 match push_traitment(&mut stack, &save_mode, &node.kind, &variables, &arrays){
-                    0=>{
-                    },
-                    1=>{
-                        let error=evaluator_error::EvaluatorError{
-                            kind:evaluator_error::ErrorType::InternarError,
-                            line:node.tokens[0].line,
+                    Ok(_) => continue,
+                    Err(error) => {
+                        let err=evaluator_error::EvaluatorError{
+                            kind:error,
+                            line:node.tokens[0].line
                         };
-                        return Err(error);
-                    }
-                    2=>{
-                        let error=evaluator_error::EvaluatorError{
-                            kind:evaluator_error::ErrorType::VariableNotDefined{name:name.clone()},
-                            line:node.tokens[0].line,
-                        };
-                        return Err(error);
-                    }
-                    3=>{
-                        let error=evaluator_error::EvaluatorError{
-                            kind:evaluator_error::ErrorType::ArrayNotDefined {name:name.clone()},
-                            line:node.tokens[0].line,
-                        };
-                        return Err(error);
-                    }
-                    4=>{
-                        let error=evaluator_error::EvaluatorError{
-                            kind:evaluator_error::ErrorType::OutOfBound,
-                            line:node.tokens[0].line,
-                        };
-                        return Err(error);
-                    }
-                    _=>{
+                        return Err(err);
                     }
                 }
             }
@@ -168,7 +144,7 @@ fn print_traitment(stack:&mut Vec<value::Value>,mode:&bool)->bool{
     true
 }
 //Function to make the traitment of the push value
-fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,variables:&HashMap<String, variable::Variable>,arrays:&HashMap<String, array::Array>)->u8{
+fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,variables:&HashMap<String, variable::Variable>,arrays:&HashMap<String, array::Array>)->Result<bool,evaluator_error::ErrorType>{
     //Checking if we have entered with the correct node to get the atributes
     if let node::NodeType::Pushnode {array,name,position,value,} = node {
         //Checking if a value, which is assigned to name de String "Null"
@@ -176,7 +152,7 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
             //Push the value directly
             stack.push(value.clone());
             //Code for ok status
-            return 0;
+            return Ok(true);
             
         }
         //Checking if is an Array
@@ -186,23 +162,23 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
                 //Checking if the save mode is on
                 if *mode{
                     //Code for array do not found
-                    return 3;
+                    return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
                 }
                 //Pushing a null value
                 stack.push(value::Value { kind: value::ValueType::Null, value:String::from("Null")});
                 //Code for ok status
-                return 0;
+                return Ok(true);
             }
             if let Some(array) = arrays.get(name) {
                 match array.get_value(position.unwrap()){
                     Ok(value)=>{
                         stack.push(value);
                         //Code for ok status
-                        return 0;
+                        return Ok(true);
                     }
                     Err(_code)=>{
                         //Code for out of bounds error
-                        return 4;
+                        return Err(evaluator_error::ErrorType::OutOfBound);
                     }
                 }
             }
@@ -213,23 +189,23 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
             //Checking if the save mode is on
             if *mode{
                 //Code for variable do not found
-                return 2;
+                return Err(evaluator_error::ErrorType::VariableNotDefined { name:name.clone() });
             }
             stack.push(value::Value { kind: value::ValueType::Null, value:String::from("Null")});
             //Code for ok status
-            return 0;
+            return Ok(true);
         }
         //Push the value in the variable in the stack
         if let Some(variable) = variables.get(name) {
             stack.push(variable.get_value());
         }
         //Code for ok status
-        return 0;
+        return Ok(true);
     }
     //return error (It's not supossed to happend, but just in case)
     else{
         //Code for internar error
-        return 1;
+        return Err(evaluator_error::ErrorType::InternarError);
     }
 }
 //Function to treat an operation
