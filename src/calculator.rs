@@ -86,6 +86,25 @@ pub fn module(val1:value::Value,val2:value::Value,mode:&bool)->Result<value::Val
     };
     Ok(value)
 }
+//Function to make the and
+pub fn and(val1:value::Value,val2:value::Value)->Result<value::Value,bool>{
+    //Checking if there is only booleans
+    if !checking_type_logical_operation(&val1.kind, &val2.kind, true){
+        return Err(false);
+    }
+    //Checking if the two values are true
+    if *val1.value==String::from("True")&&*val2.value==String::from("True"){
+        return Ok(value::Value{
+            kind:value::ValueType::Boolean,
+            value: String::from("True")
+        });
+    }
+
+    return Ok(value::Value{
+            kind:value::ValueType::Boolean,
+            value: String::from("False")
+        });
+}
 //Function to check if the type is correct for matematical operation
 fn checking_type_matematical_operation(type1:&value::ValueType,type2:&value::ValueType,string_allowed:bool)->bool{
     !(matches!(*type1, value::ValueType::Null | value::ValueType::Boolean)
@@ -97,7 +116,7 @@ fn checking_type_logical_operation(type1:&value::ValueType,type2:&value::ValueTy
     match only_boolean{
         //Case for operator AND OR
         true=>{
-            return matches!(*type1,value::ValueType::Boolean)||matches!(*type2,value::ValueType::Boolean);
+            return matches!(*type1,value::ValueType::Boolean)&&matches!(*type2,value::ValueType::Boolean);
         }
         //Case for comparators
         false=>{
