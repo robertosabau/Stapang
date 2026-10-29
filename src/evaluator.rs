@@ -3,13 +3,20 @@ use std::collections::HashMap;
 
 //Function to start the evaluation
 pub fn evaluation(nodes:Vec<node::Node>)->Result<bool, evaluator_error::EvaluatorError>{
-
+    //HashMap for the variable
+    let mut variables: HashMap<String, variable::Variable> = HashMap::new();
+    //HashMap for the arrays
+    let mut arrays:HashMap<String,array::Array>=HashMap::new();
+    //The stack of the system
+    let mut stack:Vec<value::Value>=Vec::new();
+    //Boolean for the save_mode
+    let mut save_mode:bool=true;
     //Checking if there is an save instruction
     if nodes.iter().any(|n| matches!(n.kind, node::NodeType::SaveNode { .. })) {
         //Warning to advice that during the execution of the program the save mode is changed
         println!("WARNING: Save mode will change during execution. Results may be unpredictable and errors harder to trace.");
     }
-    match evaluate_node(nodes){
+    match evaluate_node(nodes,&mut variables,&mut arrays,&mut stack,&mut save_mode){
         Ok(boolean)=>{
             return Ok(boolean);
         }
@@ -19,15 +26,7 @@ pub fn evaluation(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluato
     }
 }
 //Function to send the node where it has to go
-fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::EvaluatorError>{
-    //HashMap for the variable
-    let mut variables: HashMap<String, variable::Variable> = HashMap::new();
-    //HashMap for the arrays
-    let mut arrays:HashMap<String,array::Array>=HashMap::new();
-    //The stack of the system
-    let mut stack:Vec<value::Value>=Vec::new();
-    //Boolean for the save_mode
-    let mut save_mode:bool=true;
+fn evaluate_node(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable::Variable>,arrays:&mut HashMap<String,array::Array>,mut stack:&mut Vec<value::Value>,save_mode:&mut bool)->Result<bool, evaluator_error::EvaluatorError>{
     //For to pass around every node
     for node in nodes{
         match node.kind{
@@ -58,7 +57,7 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
             node::NodeType::Popnode { .. } =>{
 
             }
-            node::NodeType::Pushnode { ..} =>{
+            node::NodeType::Pushnode { .. } =>{
                 match push_traitment(&mut stack, &save_mode, &node.kind, &variables, &arrays){
                     Ok(_) => continue,
                     Err(error) => {
@@ -93,7 +92,7 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
                 variables.insert(name,var);
             }
             node::NodeType::SaveNode { value } =>{
-                if !save_traitment(&value, &mut save_mode){
+                if !save_traitment(&value, save_mode){
                     let error=evaluator_error::EvaluatorError{
                         kind:evaluator_error::ErrorType::BooleanExpected,
                         line: node.tokens[0].line,
