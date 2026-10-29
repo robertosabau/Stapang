@@ -9,4 +9,6 @@ pub enum ErrorType{
     ArrayNotDefined{name:String},
     InternarError,
     OutOfBound,
+    InvalidType,
+    MatematicalError,
 }

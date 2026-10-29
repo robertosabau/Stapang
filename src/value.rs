@@ -1,4 +1,4 @@
-#[derive(Clone)]
+#[derive(Clone,PartialEq)]
 pub struct Value{
     pub kind: ValueType,
     pub value: String,

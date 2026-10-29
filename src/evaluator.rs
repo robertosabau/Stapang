@@ -1,8 +1,9 @@
-use crate::{array, evaluator_error::{self, ErrorType::InternarError, EvaluatorError}, node, value, variable};
+use crate::{array, calculator, evaluator_error, node, value, variable};
 use std::collections::HashMap;
 
 //Function to start the evaluation
 pub fn evaluation(nodes:Vec<node::Node>)->Result<bool, evaluator_error::EvaluatorError>{
+
     //Checking if there is an save instruction
     if nodes.iter().any(|n| matches!(n.kind, node::NodeType::SaveNode { .. })) {
         //Warning to advice that during the execution of the program the save mode is changed
@@ -30,29 +31,23 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
     //For to pass around every node
     for node in nodes{
         match node.kind{
-            node::NodeType::AddNode=>{
+            node::NodeType::AddNode|node::NodeType::AndNode|node::NodeType::BigEquNode|node::NodeType::BigNode|node::NodeType::DivNode
+            |node::NodeType::EquNode|node::NodeType::LowEquNode|node::NodeType::SubNode|node::NodeType::MultNode|node::NodeType::ModNode
+            |node::NodeType::LowNode|node::NodeType::OrNode|node::NodeType::NotNode =>{
+                match operation_treatment(&mut stack, &save_mode, &node.kind){
+                    Ok(_) => continue,
+                    Err(error) =>{
+                        let error=evaluator_error::EvaluatorError{
+                            kind:error,
+                            line:node.tokens[0].line,
+                        };
+                        return Err(error);
+                    }
+                }
 
-            }
-            node::NodeType::AndNode=>{
-                
             }
             node::NodeType::ArrNode { .. }=>{
 
-            }
-            node::NodeType::BigEquNode=>{
-                
-            }
-            node::NodeType::BigNode=>{
-
-            }
-            node::NodeType::DivNode=>{
-                
-            }
-            node::NodeType::EquNode=>{
-
-            }
-            node::NodeType::LowEquNode=>{
-                
             }
             node::NodeType::VoidNode=>{
                 return Ok(false);
@@ -125,24 +120,6 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
             }
             node::NodeType::ReadNode => {
 
-            }
-            node::NodeType::SubNode => {
-
-            }
-            node::NodeType::MultNode => {
-
-            }
-            node::NodeType::ModNode => {
-                
-            }
-            node::NodeType::LowNode => {
-                
-            }
-            node::NodeType::NotNode => {
-                
-            }
-            node::NodeType::OrNode => {
-                
             }
         }
     }
@@ -249,7 +226,199 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
     }
 }
 //Function to treat an operation
-pub fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:node::NodeType)->u8{
-    
-    0
+fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType)->Result<bool,evaluator_error::ErrorType>{
+    let return_value;
+    let val1 = match stack.pop() {
+        Some(value) => value,
+        None => {
+            // Checking if the safe mode is on
+            if *mode {
+                return Err(evaluator_error::ErrorType::InternarError);
+            }
+            // Getting a "Null" value for the safe mode off
+            value::Value {
+                kind: value::ValueType::Null,
+                value: String::from("Null"),
+            }
+        }
+    };
+    if *node!=node::NodeType::NotNode{
+        let val2 = match stack.pop() {
+            Some(value) => value,
+            None => {
+                // Checking if the safe mode is on
+                if *mode {
+                    //Code for error of not element in stack
+                    return Err(evaluator_error::ErrorType::InternarError);
+                }
+                // Getting a "Null" value for the safe mode off
+                value::Value {
+                    kind: value::ValueType::Null,
+                    value: String::from("Null"),
+                }
+            }
+        };
+        //Match to make the operation
+        match node{
+            //Addittion
+            node::NodeType::AddNode=>{
+                match calculator::addition(&val1,&val2){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    //Returning code for invalid type
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidType),
+                }
+            }
+            //Substraction
+            node::NodeType::SubNode=>{
+                match calculator::subtraction(&val1,&val2){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    //Returning code for invalid type
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidType),
+                }
+            }
+            //multiplication
+            node::NodeType::MultNode=>{
+                match calculator::multiply(&val1,&val2){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    //Returning code for invalid type
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidType),
+                }
+            }
+            //Dividiton
+            node::NodeType::DivNode=>{
+                match calculator::divide(&val1,&val2,mode){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    Err(type_error) =>{
+                        if type_error{
+                            //code for invalid type
+                            return Err(evaluator_error::ErrorType::InvalidType);
+                        }
+                        else{
+                            //Code for matematical error
+                            return Err(evaluator_error::ErrorType::MatematicalError);
+                        }
+                    }
+                }
+            }
+            //Module
+            node::NodeType::ModNode=>{
+                match calculator::module(&val1,&val2,mode){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    //Returning code for invalid type
+                    Err(type_error) =>{
+                        if type_error{
+                            //code for invalid type
+                            return Err(evaluator_error::ErrorType::InvalidType);
+                        }
+                        else{
+                            //Code for matematical error
+                            return Err(evaluator_error::ErrorType::MatematicalError);
+                        }
+                    }
+                }
+            }
+            //AND
+            node::NodeType::AndNode=>{
+                match calculator::and(&val1,&val2){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    //Returning code for invalid type
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidType),
+                }
+            }
+            //OR
+            node::NodeType::OrNode=>{
+                match calculator::or(&val1,&val2){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    //Returning code for invalid type
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidType),
+                }
+            }
+            //Equal
+            node::NodeType::EquNode=>{
+                match calculator::equals(&val1,&val2){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    //Returning code for invalid type
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidType),
+                }
+            }
+            //Bigger
+            node::NodeType::BigNode=>{
+                match calculator::greater(&val1,&val2){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    //Returning code for invalid type
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidType),
+                }
+            }
+            //lower
+            node::NodeType::LowNode=>{
+                match calculator::lower(&val1,&val2){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    Err(type_error) =>{
+                            return Err(evaluator_error::ErrorType::InvalidType);
+                    }
+                }
+            }
+            //bigger or equal
+            node::NodeType::BigEquNode=>{
+                match calculator::greater_equal(&val1,&val2){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    //Returning code for invalid type
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidType),
+                }
+            }
+            //lower or equal
+            node::NodeType::LowEquNode=>{
+                match calculator::lower_equal(&val1,&val2){
+                    Ok(value) =>{
+                        return_value=value;
+                    }
+                    //Returning code for invalid type
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidType),
+                }
+            }
+            _=>{
+                //Code for internar error
+                return Err(evaluator_error::ErrorType::InternarError);
+            }
+        }
+    }
+    else{
+        match calculator::not(&val1){
+            Ok(value) =>{
+                return_value=value;
+            }
+            //Returning code for invalid type
+            Err(_) => return Err(evaluator_error::ErrorType::InternarError),
+        }
+    }
+    //Putting the value at the stack to have it
+    stack.push(return_value);
+    //Code for everything okey
+    Ok(true)
+}
+//Function to traet the declaration cases
+fn declaration_treatment(){
+
 }
