@@ -387,7 +387,6 @@ fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     let node: node::Node;
     let name:String;
     let mut kind:ValueType=ValueType::Null;
-    *index+=1;
     //Checking if their is an identifier
     if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
@@ -438,7 +437,6 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     let name:String;
     let num:String;
     let mut kind:ValueType=ValueType::Null;
-    *index+=1;
     //Checking if their is an identifier
     if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{

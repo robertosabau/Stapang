@@ -1,4 +1,4 @@
-use crate::{array, calculator, evaluator_error, node, value, variable};
+use crate::{array, calculator, evaluator_error, node, value, variable::{self, Variable}};
 use std::collections::HashMap;
 
 //Function to start the evaluation
@@ -46,8 +46,11 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
                 }
 
             }
-            node::NodeType::ArrNode { .. }=>{
-
+            node::NodeType::ArrNode {name,positions,kind }=>{
+                //Creation of variable
+                let array:array::Array=array::Array::new(name.clone(), kind,positions.parse::<usize>().unwrap());
+                //Saving the variable at the hashmap for variable
+                arrays.insert(name,array);
             }
             node::NodeType::VoidNode=>{
                 return Ok(false);
@@ -106,8 +109,12 @@ fn evaluate_node(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluator
             node::NodeType::WhileNode { .. } => {
 
             }
-            node::NodeType::VarNode { .. } => {
-
+            //Treatment variable creation
+            node::NodeType::VarNode { name,kind } => {
+                //Creation of variable
+                let var:variable::Variable=Variable::new(name.clone(), kind);
+                //Saving the variable at the hashmap for variable
+                variables.insert(name,var);
             }
             node::NodeType::SaveNode { value } =>{
                 if !save_traitment(&value, &mut save_mode){
@@ -373,7 +380,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
                     Ok(value) =>{
                         return_value=value;
                     }
-                    Err(type_error) =>{
+                    Err(_) =>{
                             return Err(evaluator_error::ErrorType::InvalidType);
                     }
                 }
@@ -417,8 +424,4 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
     stack.push(return_value);
     //Code for everything okey
     Ok(true)
-}
-//Function to traet the declaration cases
-fn declaration_treatment(){
-
 }
