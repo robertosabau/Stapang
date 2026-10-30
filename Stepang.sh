@@ -1,2 +1,2 @@
-cargo run --quiet -- "$1"
+cargo run --release --quiet -- "$1"
 read

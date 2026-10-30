@@ -79,7 +79,7 @@ fn evaluate_node(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable::
                 }
             },
             node::NodeType::IfNode { .. } =>{
-
+                
             }
             node::NodeType::WhileNode { .. } => {
 
