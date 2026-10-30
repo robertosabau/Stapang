@@ -79,7 +79,7 @@ fn evaluate_node(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable::
                 }
             },
             node::NodeType::IfNode { .. } =>{
-                
+
             }
             node::NodeType::WhileNode { .. } => {
 
@@ -110,14 +110,11 @@ fn evaluate_node(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable::
 //Function to make the traitment of the save instruction
 fn save_traitment(value:&value::Value,mode:&mut bool)->bool{
     //Cases for the value intruduced
-    match value.value.as_str(){
-        "True"=>{
-            *mode=true;
-        }
-        "False"=>{
-            *mode=false;
-        }
-        _=> return false
+    if value.is_a_true(){
+        *mode=true;
+    }
+    else{
+        *mode=true;
     }
     true
 }
@@ -132,10 +129,7 @@ fn print_traitment(stack:&mut Vec<value::Value>,mode:&bool)->bool{
                 return false;
             }
             // Getting a "Null" value for the safe mode off
-            value::Value {
-                kind: value::ValueType::Null,
-                value: String::from("Null"),
-            }
+            value::Value::set_as_null()
         }
     };
     //Printing the value that was in ther first position of the stack
@@ -164,7 +158,7 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
                     return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
                 }
                 //Pushing a null value
-                stack.push(value::Value { kind: value::ValueType::Null, value:String::from("Null")});
+                stack.push(value::Value::set_as_null());
                 //Code for ok status
                 return Ok(true);
             }
@@ -218,10 +212,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
                 return Err(evaluator_error::ErrorType::InternarError);
             }
             // Getting a "Null" value for the safe mode off
-            value::Value {
-                kind: value::ValueType::Null,
-                value: String::from("Null"),
-            }
+            value::Value::set_as_null()
         }
     };
     if *node!=node::NodeType::NotNode{
@@ -234,10 +225,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
                     return Err(evaluator_error::ErrorType::InternarError);
                 }
                 // Getting a "Null" value for the safe mode off
-                value::Value {
-                    kind: value::ValueType::Null,
-                    value: String::from("Null"),
-                }
+                value::Value::set_as_null()
             }
         };
         //Match to make the operation

@@ -195,15 +195,16 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
     //Match to know which value we have
     match token.kind{
         tokens::TokenType::True =>{
-            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Boolean, value: String::from("True") }}}
+            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value::set_as_true()}
+        }
         tokens::TokenType::False =>{
-            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Boolean, value: String::from("Flase") }}
+            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value::set_as_false() }
         },
         tokens::TokenType::Num=>{
-            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Number,value:token.value.clone()}}
+            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value::set_as_number(token.value.clone())}
         }
         tokens::TokenType::Str=>{
-            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value { kind:ValueType::Text,value:token.value.clone()}}
+            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value::set_as_text(token.value.clone())}
         }
         tokens::TokenType::Ide=>{
             //Checking if there is the identifier is for an array
@@ -225,11 +226,11 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
                     };
                     return Err(error);
                 }
-                node=node::NodeType::Pushnode { array: true, name:token.value.clone(), position:num.parse::<usize>().ok(), value:value::Value { kind:ValueType::Null,value:String::from("Null")}}
+                node=node::NodeType::Pushnode { array: true, name:token.value.clone(), position:num.parse::<usize>().ok(), value:value::Value::set_as_null()}
             }
             else{
                 *index-=1;
-                node=node::NodeType::Pushnode { array: false, name:token.value.clone(), position:Some(0), value:value::Value { kind:ValueType::Null,value:String::from("Null")}}
+                node=node::NodeType::Pushnode { array: false, name:token.value.clone(), position:Some(0), value:value::Value::set_as_null()}
             }
         }
         _=>{
@@ -355,10 +356,10 @@ fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
         };
         return Err(error);
     }
-    let val:String=match token.kind{
-        tokens::TokenType::True => String::from("True"),
-        tokens::TokenType::False => String::from("False"),
-        _ => String::from("Error"),
+    value=match token.kind{
+        tokens::TokenType::True => value::Value::set_as_true(),
+        tokens::TokenType::False => value::Value::set_as_false(),
+        _ => value::Value::set_as_null(),
     };
     //Checking if the sentence is closed with a semicolon, the end of the sentence
     if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
@@ -369,10 +370,6 @@ fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
         return Err(error);
     }
     node_tokens.push(tokens[*index].clone());
-    value=value::Value{
-        kind: value::ValueType::Boolean,
-        value: val,
-    };
     node=node::Node{
         kind: node::NodeType::SaveNode { value:value },
         tokens: node_tokens,

@@ -15,7 +15,6 @@ mod evaluator;
 mod evaluator_error;
 mod array;
 mod calculator;
-
 fn main() {
     /*
     Timer for check the time to make an instruction
