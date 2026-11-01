@@ -10,5 +10,5 @@ pub enum ErrorType{
     InternarError,
     OutOfBound,
     InvalidType,
-    MatematicalError,
+    DivisionByZero,
 }

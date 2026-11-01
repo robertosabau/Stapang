@@ -273,7 +273,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
                         }
                         else{
                             //Code for matematical error
-                            return Err(evaluator_error::ErrorType::MatematicalError);
+                            return Err(evaluator_error::ErrorType::DivisionByZero);
                         }
                     }
                 }
@@ -292,7 +292,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
                         }
                         else{
                             //Code for matematical error
-                            return Err(evaluator_error::ErrorType::MatematicalError);
+                            return Err(evaluator_error::ErrorType::DivisionByZero);
                         }
                     }
                 }
