@@ -508,7 +508,7 @@ fn is_while(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usi
     let node: node::Node;
     let mut nodes:Vec<node::Node>=Vec::new();
     //Checking if their is an open curvy bracked to start the secuence of sentences of the while
-    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
+    if !check_if_is_token(tokens::TokenType::OCB,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
             kind: parser_error::ErrorType::OpenCurvyBrackedExpected ,
             line: token.line,

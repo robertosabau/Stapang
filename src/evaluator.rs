@@ -104,8 +104,39 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                     }
                 }
             }
-            node::NodeType::WhileNode { .. } => {
-
+            node::NodeType::WhileNode { instructions } => {
+                //Getting the value in the stack
+                let mut value=match stack.pop(){
+                    Some(value) => value,
+                    None =>{
+                        if *save_mode{
+                            return Err(evaluator_error::EvaluatorError {
+                                kind: evaluator_error::ErrorType::StackEmpty,
+                                line: node.tokens[0].line 
+                            });
+                        }
+                        value::Value::set_as_null()
+                    } 
+                };
+                //Entering a while if the value was a boolean true
+                while value.is_a_true(){
+                    match evaluate_nodes(instructions.clone(), variables, arrays, stack, save_mode){
+                        Ok(_) =>{}
+                        Err(error) => return Err(error),
+                    }
+                    value=match stack.pop(){
+                        Some(value) => value,
+                        None =>{
+                            if *save_mode{
+                                return Err(evaluator_error::EvaluatorError {
+                                    kind: evaluator_error::ErrorType::StackEmpty,
+                                    line: node.tokens[0].line 
+                                });
+                            }
+                            value::Value::set_as_null()
+                        } 
+                    };
+                }
             }
             //Treatment variable creation
             node::NodeType::VarNode { name,kind } => {
