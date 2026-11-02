@@ -341,11 +341,11 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
                     Err(type_error) =>{
                         if type_error{
                             //code for invalid type
-                            return Err(evaluator_error::ErrorType::InvalidType);
+                            return Err(evaluator_error::ErrorType::DivisionByZero);
                         }
                         else{
                             //Code for matematical error
-                            return Err(evaluator_error::ErrorType::DivisionByZero);
+                            return Err(evaluator_error::ErrorType::InvalidType);
                         }
                     }
                 }
@@ -360,11 +360,11 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
                     Err(type_error) =>{
                         if type_error{
                             //code for invalid type
-                            return Err(evaluator_error::ErrorType::InvalidType);
+                            return Err(evaluator_error::ErrorType::DivisionByZero);
                         }
                         else{
                             //Code for matematical error
-                            return Err(evaluator_error::ErrorType::DivisionByZero);
+                            return Err(evaluator_error::ErrorType::InvalidType);
                         }
                     }
                 }
