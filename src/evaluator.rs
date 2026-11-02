@@ -16,7 +16,7 @@ pub fn evaluation(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluato
         //Warning to advice that during the execution of the program the save mode is changed
         println!("WARNING: Save mode will change during execution. Results may be unpredictable and errors harder to trace.");
     }
-    match evaluate_node(nodes,&mut variables,&mut arrays,&mut stack,&mut save_mode){
+    match evaluate_nodes(nodes,&mut variables,&mut arrays,&mut stack,&mut save_mode){
         Ok(boolean)=>{
             return Ok(boolean);
         }
@@ -26,7 +26,7 @@ pub fn evaluation(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluato
     }
 }
 //Function to send the node where it has to go
-fn evaluate_node(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable::Variable>,arrays:&mut HashMap<String,array::Array>,mut stack:&mut Vec<value::Value>,save_mode:&mut bool)->Result<bool, evaluator_error::EvaluatorError>{
+fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable::Variable>,arrays:&mut HashMap<String,array::Array>,mut stack:&mut Vec<value::Value>,save_mode:&mut bool)->Result<bool, evaluator_error::EvaluatorError>{
     //For to pass around every node
     for node in nodes{
         match node.kind{
@@ -78,8 +78,31 @@ fn evaluate_node(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable::
                     return Err(error);
                 }
             },
-            node::NodeType::IfNode { .. } =>{
-
+            node::NodeType::IfNode { instructions,else_instructions } =>{
+                let value=match stack.pop(){
+                    Some(value) => value,
+                    None =>{
+                        if *save_mode{
+                            return Err(evaluator_error::EvaluatorError {
+                                kind: evaluator_error::ErrorType::StackEmpty,
+                                line: node.tokens[0].line 
+                            });
+                        }
+                        value::Value::set_as_null()
+                    } 
+                };
+                if value.is_a_true(){
+                    match evaluate_nodes(instructions, variables, arrays, stack, save_mode){
+                        Ok(_) => continue,
+                        Err(error) => return Err(error),
+                    }
+                }
+                else{
+                    match evaluate_nodes(else_instructions, variables, arrays, stack, save_mode){
+                        Ok(_) => continue,
+                        Err(error) => return Err(error),
+                    }
+                }
             }
             node::NodeType::WhileNode { .. } => {
 
