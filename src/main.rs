@@ -40,7 +40,12 @@ fn main() {
             Ok(tokens)=>{
                 match parser::parsing(tokens){
                     Ok(_nodes)=>{
-                        evaluator::evaluation(_nodes);
+                        match evaluator::evaluation(_nodes){
+                            Ok(_) =>{}
+                            Err(problem) =>{ 
+                                show_evaluator_error(problem);
+                                std::process::exit(1);}
+                            }
                     },
                     Err(problem)=>{
                         show_parser_error(problem);
@@ -108,6 +113,34 @@ fn show_parser_error(error:ParserError){
         }
         parser_error::ErrorType::TypeExpected=>{
             eprintln!("Syntax Error: type expected in line {}",error.line);
+        }
+    }
+}
+fn show_evaluator_error(error:evaluator_error::EvaluatorError){
+    match error.kind {
+        evaluator_error::ErrorType::BooleanExpected=>{
+            eprintln!("Runtime Error: an Boolean was expected in line {}",error.line);
+        }
+        evaluator_error::ErrorType::StackEmpty =>{
+            eprintln!("Runtime Error: the Stack was empty when tried to take out a value in line {}",error.line)
+        }
+        evaluator_error::ErrorType::VariableNotDefined { name } =>{
+            eprintln!("Runtine Error: the variable {} was not defined when tried to used it in line {}",name,error.line)
+        }
+        evaluator_error::ErrorType::ArrayNotDefined { name } =>{ 
+            eprintln!("Runtine Error: the array {} was not defined when tried to used it in line {}",name,error.line)
+        }
+        evaluator_error::ErrorType::InternarError =>{
+            eprintln!("Inexpected Error: has ocurred an error that was not supossed to happend in the internar code")
+        }
+        evaluator_error::ErrorType::OutOfBound =>{
+            eprintln!("Runtime Error: intented to access a position out of bounds in line {}",error.line)
+        }
+        evaluator_error::ErrorType::InvalidType =>{
+            eprintln!("Runtime Error: invalid type used in line {}",error.line)
+        }
+        evaluator_error::ErrorType::DivisionByZero => {
+            eprintln!("Runtime Error: division by zero made in line {}",error.line)
         }
     }
 }

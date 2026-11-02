@@ -79,6 +79,7 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                 }
             },
             node::NodeType::IfNode { instructions,else_instructions } =>{
+                //Getting the value in the stack
                 let value=match stack.pop(){
                     Some(value) => value,
                     None =>{
@@ -91,12 +92,21 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                         value::Value::set_as_null()
                     } 
                 };
+                //Checking if the value is not a boolean
+                if !(value.is_a_true()||value.is_a_false()){
+                    return Err(evaluator_error::EvaluatorError{
+                        kind: evaluator_error::ErrorType::BooleanExpected,
+                        line: node.tokens[0].line,
+                    })
+                }
+                //Executing instruction in case of true
                 if value.is_a_true(){
                     match evaluate_nodes(instructions, variables, arrays, stack, save_mode){
                         Ok(_) => continue,
                         Err(error) => return Err(error),
                     }
                 }
+                //Executing instruction in case of false
                 else{
                     match evaluate_nodes(else_instructions, variables, arrays, stack, save_mode){
                         Ok(_) => continue,
@@ -118,12 +128,20 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                         value::Value::set_as_null()
                     } 
                 };
+                //Checking if the value is not a boolean
+                if !(value.is_a_true()||value.is_a_false()){
+                    return Err(evaluator_error::EvaluatorError{
+                        kind: evaluator_error::ErrorType::BooleanExpected,
+                        line: node.tokens[0].line,
+                    })
+                }
                 //Entering a while if the value was a boolean true
                 while value.is_a_true(){
                     match evaluate_nodes(instructions.clone(), variables, arrays, stack, save_mode){
                         Ok(_) =>{}
                         Err(error) => return Err(error),
                     }
+                    //Getting the value in the stack
                     value=match stack.pop(){
                         Some(value) => value,
                         None =>{
