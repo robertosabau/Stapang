@@ -151,5 +151,8 @@ fn show_evaluator_error(error:evaluator_error::EvaluatorError){
         evaluator_error::ErrorType::InvalidValue => {
             eprintln!("Runtime Error: tried to set a value invalid in a variable/array in line {}",error.line)
         }
+        evaluator_error::ErrorType::VariableNotInicializated { name } =>{
+            eprintln!("Runtine Error: the variable {} was not inicializated when tried to used it in line {}",name,error.line)
+        }
     }
 }

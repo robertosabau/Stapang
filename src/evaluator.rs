@@ -253,6 +253,9 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
             if let Some(array) = arrays.get(name) {
                 match array.get_value(position.unwrap()){
                     Ok(value)=>{
+                        if value.is_a_null()&&*mode{
+                            return Err(evaluator_error::ErrorType::VariableNotInicializated { name:name.clone() });
+                        }
                         stack.push(value);
                         //Code for ok status
                         return Ok(true);
@@ -272,12 +275,16 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
                 //Code for variable do not found
                 return Err(evaluator_error::ErrorType::VariableNotDefined { name:name.clone() });
             }
+            
             stack.push(value::Value::set_as_null());
             //Code for ok status
             return Ok(true);
         }
         //Push the value in the variable in the stack
         if let Some(variable) = variables.get(name) {
+            if variable.get_value().is_a_null()&&*mode{
+                return Err(evaluator_error::ErrorType::VariableNotInicializated { name:name.clone() });
+            }
             stack.push(variable.get_value());
         }
         //Code for ok status

@@ -14,4 +14,5 @@ pub enum ErrorType{
     ReadError,
     CannotConvertToNumber,
     InvalidValue,
+    VariableNotInicializated{name:String},
 }

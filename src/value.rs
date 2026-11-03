@@ -41,6 +41,10 @@ impl Value{
             value: String::from("Null")
         }
     }
+    //Checking if it is a null
+    pub fn is_a_null(&self)->bool{
+        matches!(self.kind,ValueType::Null)
+    }
     //Create a number value
     pub fn set_as_number(value:String)->Self{
         Self {
