@@ -154,5 +154,8 @@ fn show_evaluator_error(error:evaluator_error::EvaluatorError){
         evaluator_error::ErrorType::VariableNotInicializated { name } =>{
             eprintln!("Runtine Error: the variable {} was not inicializated when tried to used it in line {}",name,error.line)
         }
+        evaluator_error::ErrorType::ArrayNotInicializated { name,position } =>{
+            eprintln!("Runtine Error: the position {} in the array {} was not inicializated when tried to used it in line {}",position,name,error.line)
+        }
     }
 }

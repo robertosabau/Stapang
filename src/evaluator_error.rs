@@ -15,4 +15,5 @@ pub enum ErrorType{
     CannotConvertToNumber,
     InvalidValue,
     VariableNotInicializated{name:String},
+    ArrayNotInicializated{name:String,position:usize},
 }

@@ -254,7 +254,7 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
                 match array.get_value(position.unwrap()){
                     Ok(value)=>{
                         if value.is_a_null()&&*mode{
-                            return Err(evaluator_error::ErrorType::VariableNotInicializated { name:name.clone() });
+                            return Err(evaluator_error::ErrorType::ArrayNotInicializated { name:name.clone(),position:position.unwrap()});
                         }
                         stack.push(value);
                         //Code for ok status
