@@ -148,5 +148,8 @@ fn show_evaluator_error(error:evaluator_error::EvaluatorError){
         evaluator_error::ErrorType::CannotConvertToNumber => {
             eprintln!("Runtime Error: tried to convert an invalid str to a number in line {}",error.line)
         }
+        evaluator_error::ErrorType::InvalidValue => {
+            eprintln!("Runtime Error: tried to set a value invalid in a variable/array in line {}",error.line)
+        }
     }
 }

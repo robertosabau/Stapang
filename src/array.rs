@@ -1,4 +1,4 @@
-use crate::{ value};
+use crate::{ evaluator_error::{self}, value};
 pub struct Array{
     kind: value::ValueType,
     values: Vec<value::Value>,
@@ -9,26 +9,26 @@ impl Array {
     pub fn new(kind:value::ValueType,position:usize)->Self{
         Self { 
             kind,
-            values:vec![value::Value {
-                kind: value::ValueType::Null,
-                value: String::from("Null"),
-            };
+            values:vec![value::Value::set_as_null();
             position],
             positions:position,
         }
     }//Function to set the value in a save way
-    pub fn set_value(&mut self,value:value::Value,position:usize)->bool{
+    pub fn set_value(&mut self,value:value::Value,position:usize)->Result<bool,evaluator_error::ErrorType>{
+        if position>=self.positions{
+            return Err(evaluator_error::ErrorType::OutOfBound);
+        }
         match value.kind{
             value::ValueType::Null=>{
                 self.values[position]=value;
-                return true;
+                return Ok(true);
             }
             _=>{
                 if self.kind==value::ValueType::Any||self.kind==value.kind{
                     self.values[position]=value;
-                    return true;
+                    return Ok(true);
                 }
-                false
+                Err(evaluator_error::ErrorType::InvalidValue)
             }
         }
     }

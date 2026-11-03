@@ -1,9 +1,9 @@
-#[derive(Clone,PartialEq)]
+#[derive(Clone,PartialEq,Debug)]
 pub struct Value{
     pub kind: ValueType,
     pub value: String,
 }
-#[derive(PartialEq,Clone)]
+#[derive(PartialEq,Clone,Debug)]
 pub enum ValueType{
     Text,
     Number,
@@ -40,10 +40,6 @@ impl Value{
             kind: ValueType::Null,
             value: String::from("Null")
         }
-    }
-    //Checking if it is a null
-    pub fn is_a_null(&self)->bool{
-        matches!(self.kind,ValueType::Null)
     }
     //Create a number value
     pub fn set_as_number(value:String)->Self{

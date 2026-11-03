@@ -138,8 +138,9 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
 fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
-    let mut num:String=String::from("");
+    let mut num:String=String::from("0");
     let name;
+    let mut is_array = false;
     //Checking if their is an identifier to get where to put the value of the stack
     if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
@@ -151,6 +152,7 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     name=token.value.clone();
     //Checking if there is the identifier is for an array
     if check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
+        is_array=true;
         //Checking if there is the number of the position in the array
         if !check_if_is_token(tokens::TokenType::Num,token,tokens,index,&mut node_tokens){
             let error=parser_error::ParserError{
@@ -169,6 +171,9 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
             return Err(error);
         }
     }
+    else {
+        *index -= 1;
+    }
     //Checking if the sentence is closed with a semicolon, the end of the sentence
     if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
          let error=parser_error::ParserError{
@@ -179,7 +184,7 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     }
     node_tokens.push(tokens[*index].clone());
     node=node::Node{
-        kind: node::NodeType::Popnode{array:true,position:num.parse().unwrap(),name: name},
+        kind: node::NodeType::Popnode{array:is_array,position:num.parse().unwrap(),name: name},
         tokens: node_tokens,
     };
     return Ok(node);
@@ -215,6 +220,8 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
             node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value::set_as_text(token.value.clone())}
         }
         tokens::TokenType::Ide=>{
+            //Saving the name of the identifier
+            let name = token.value.clone();
             //Checking if there is the identifier is for an array
             if check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
                 //Checking if there is the number of the position in the array
@@ -234,11 +241,11 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
                     };
                     return Err(error);
                 }
-                node=node::NodeType::Pushnode { array: true, name:token.value.clone(), position:num.parse::<usize>().ok(), value:value::Value::set_as_null()}
+                node=node::NodeType::Pushnode { array: true, name:name, position:num.parse::<usize>().ok(), value:value::Value::set_as_null()}
             }
             else{
                 *index-=1;
-                node=node::NodeType::Pushnode { array: false, name:token.value.clone(), position:Some(0), value:value::Value::set_as_null()}
+                node=node::NodeType::Pushnode { array: false, name:name, position:Some(0), value:value::Value::set_as_null()}
             }
         }
         _=>{

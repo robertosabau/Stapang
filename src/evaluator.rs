@@ -55,8 +55,11 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
             node::NodeType::VoidNode=>{
                 return Ok(false);
             }
-            node::NodeType::Popnode { .. } =>{
-
+            node::NodeType::Popnode { array,position,name } =>{
+                match pop_traitment(variables, arrays, stack, save_mode, &name, &array, &position){
+                    Ok(_) =>{}
+                    Err(error) =>return Err(evaluator_error::EvaluatorError{kind:error,line:node.tokens[0].line}),
+                }
             }
             node::NodeType::Pushnode { .. } =>{
                 match push_traitment(&mut stack, &save_mode, &node.kind, &variables, &arrays){
@@ -294,7 +297,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
         None => {
             // Checking if the safe mode is on
             if *mode {
-                return Err(evaluator_error::ErrorType::InternarError);
+                return Err(evaluator_error::ErrorType::StackEmpty);
             }
             // Getting a "Null" value for the safe mode off
             value::Value::set_as_null()
@@ -307,7 +310,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
                 // Checking if the safe mode is on
                 if *mode {
                     //Code for error of not element in stack
-                    return Err(evaluator_error::ErrorType::InternarError);
+                    return Err(evaluator_error::ErrorType::StackEmpty);
                 }
                 // Getting a "Null" value for the safe mode off
                 value::Value::set_as_null()
@@ -500,5 +503,36 @@ fn treatment_read(stack:&mut Vec<value::Value>,format:&value::ValueType)->Result
         val=value::Value::set_as_text(input);
     }
     stack.push(val);
+    Ok(true)
+}
+fn pop_traitment(variables:&mut HashMap<String, variable::Variable>,arrays:&mut HashMap<String, array::Array>,stack:&mut Vec<value::Value>,mode:&bool,name:&String,array:&bool,position:&usize)->Result<bool, evaluator_error::ErrorType>{
+    let val = match stack.pop() {
+        Some(value) => value,
+        None => {
+            // Checking if the safe mode is on
+            if *mode {
+                return Err(evaluator_error::ErrorType::StackEmpty);
+            }
+            // Getting a "Null" value for the safe mode off
+            value::Value::set_as_null()
+        }
+    };
+    if *array{
+        if !arrays.contains_key(name){
+            return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
+        }
+        let array:&mut array::Array=arrays.get_mut(name).unwrap();
+        match array.set_value(val, position.clone()){
+            Ok(_) =>return Ok(true),
+            Err(error) =>return Err(error),
+        }
+    }
+    if !variables.contains_key(name){
+        return Err(evaluator_error::ErrorType::VariableNotDefined { name:name.clone() });
+    }
+    let variable:&mut variable::Variable=variables.get_mut(name).unwrap();
+    if !variable.set_value(val){
+        return Err(evaluator_error::ErrorType::InvalidValue);
+    }
     Ok(true)
 }

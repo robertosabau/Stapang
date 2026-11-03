@@ -8,7 +8,7 @@ impl Variable{
     pub fn new(kind:value::ValueType)->Self{
         Self {
             kind,
-            value: value::Value { kind:value::ValueType::Null, value: String::from("Null") },
+            value: value::Value::set_as_null(),
         }
     }
     //Function to set the value in a save way

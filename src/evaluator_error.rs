@@ -13,4 +13,5 @@ pub enum ErrorType{
     DivisionByZero,
     ReadError,
     CannotConvertToNumber,
+    InvalidValue,
 }

@@ -2,12 +2,12 @@ use crate::tokens;
 use crate::value;
 use crate::value::ValueType;
 
-#[derive(PartialEq,Clone)]
+#[derive(PartialEq,Clone,Debug)]
 pub struct Node{
     pub kind: NodeType,
     pub tokens: Vec<tokens::Token>,
 }
-#[derive(PartialEq,Clone)]
+#[derive(PartialEq,Clone,Debug)]
 pub enum NodeType{
     VoidNode, //Node for the case their is not else instruction in the if node
     Popnode {array:bool,position:usize,name: String}, //Node for Pop instruction
