@@ -199,7 +199,7 @@ fn save_traitment(value:&value::Value,mode:&mut bool)->bool{
         *mode=true;
     }
     else{
-        *mode=true;
+        *mode=false;
     }
     true
 }
