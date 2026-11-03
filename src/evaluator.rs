@@ -172,8 +172,8 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                     return Err(error);
                 }
             }
-            node::NodeType::ReadNode => {
-
+            node::NodeType::ReadNode {format} => {
+                
             }
         }
     }

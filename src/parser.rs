@@ -47,7 +47,15 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
                     }
                 }
             },
-            tokens::TokenType::Print | tokens::TokenType::Read | tokens::TokenType::Add 
+            tokens::TokenType::Read=>{
+                match is_read(token, tokens, &mut index){
+                    Ok(node) =>{
+                        *index+=1;
+                        return Ok(node);},
+                    Err(error) => return Err(error),
+                }
+            }
+            tokens::TokenType::Print | tokens::TokenType::Add 
             | tokens::TokenType::Sub | tokens::TokenType::Mult | tokens::TokenType::Div
             | tokens::TokenType::Equ | tokens::TokenType::Big | tokens::TokenType::Low
             | tokens::TokenType::BigEqu| tokens::TokenType::LowEqu | tokens::TokenType::Not
@@ -276,9 +284,6 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
     match *kind{
         tokens::TokenType::Print=>{
             node_kind=node::NodeType::PrintNode;
-        }
-        tokens::TokenType::Read=>{
-            node_kind=node::NodeType::ReadNode;
         }
         tokens::TokenType::Add=>{
             node_kind=node::NodeType::AddNode;
@@ -714,4 +719,33 @@ fn there_is_a_value(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &
         TokenType::Num|TokenType::Ide|TokenType::True|TokenType::False|TokenType::Str=>return true,
         _=>return false,
     }
+}
+//Function for the read instruction
+fn is_read(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize)->Result<node::Node,parser_error::ParserError>{
+    let mut node_tokens:Vec<tokens::Token>=Vec::new();
+    let node: node::Node;
+    let mut kind:ValueType=ValueType::Null;
+    //Checking if there is an type for the array
+    if !there_is_a_type(&mut kind, token, tokens, index, &mut node_tokens){
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::TypeExpected,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    //Checking if the sentence is closed with a semicolon, the end of the sentence
+    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
+         let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::SemiColonExpected ,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    node_tokens.push(tokens[*index].clone());
+    *token = tokens[*index].clone();
+    node=node::Node{
+        kind:node::NodeType::ReadNode { format: kind },
+        tokens:node_tokens
+    };
+    Ok(node)
 }
