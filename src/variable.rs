@@ -1,14 +1,12 @@
 use crate::value;
 pub struct Variable{
-    identifier: String,
     kind: value::ValueType,
     value: value::Value,
 }
 impl Variable{
     //Constructor of a Variable
-    pub fn new(name:String,kind:value::ValueType)->Self{
-        Self { 
-            identifier:name,
+    pub fn new(kind:value::ValueType)->Self{
+        Self {
             kind,
             value: value::Value { kind:value::ValueType::Null, value: String::from("Null") },
         }

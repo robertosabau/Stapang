@@ -1,15 +1,13 @@
 use crate::{ value};
 pub struct Array{
-    identifier: String,
     kind: value::ValueType,
     values: Vec<value::Value>,
     positions:usize,
 }
 impl Array {
     //Constructor of a Array
-    pub fn new(name:String,kind:value::ValueType,position:usize)->Self{
+    pub fn new(kind:value::ValueType,position:usize)->Self{
         Self { 
-            identifier:name,
             kind,
             values:vec![value::Value {
                 kind: value::ValueType::Null,

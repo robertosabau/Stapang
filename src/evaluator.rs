@@ -48,7 +48,7 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
             }
             node::NodeType::ArrNode {name,positions,kind }=>{
                 //Creation of variable
-                let array:array::Array=array::Array::new(name.clone(), kind,positions.parse::<usize>().unwrap());
+                let array:array::Array=array::Array::new( kind,positions.parse::<usize>().unwrap());
                 //Saving the variable at the hashmap for variable
                 arrays.insert(name,array);
             }
@@ -160,7 +160,7 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
             //Treatment variable creation
             node::NodeType::VarNode { name,kind } => {
                 //Creation of variable
-                let var:variable::Variable=Variable::new(name.clone(), kind);
+                let var:variable::Variable=Variable::new(kind);
                 //Saving the variable at the hashmap for variable
                 variables.insert(name,var);
             }
@@ -269,7 +269,7 @@ fn push_traitment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeType,v
                 //Code for variable do not found
                 return Err(evaluator_error::ErrorType::VariableNotDefined { name:name.clone() });
             }
-            stack.push(value::Value { kind: value::ValueType::Null, value:String::from("Null")});
+            stack.push(value::Value::set_as_null());
             //Code for ok status
             return Ok(true);
         }
