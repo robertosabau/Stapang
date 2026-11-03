@@ -142,5 +142,11 @@ fn show_evaluator_error(error:evaluator_error::EvaluatorError){
         evaluator_error::ErrorType::DivisionByZero => {
             eprintln!("Runtime Error: division by zero made in line {}",error.line)
         }
+        evaluator_error::ErrorType::ReadError => {
+            eprintln!("Runtime Error: was not posible to read in line {}",error.line)
+        }
+        evaluator_error::ErrorType::CannotConvertToNumber => {
+            eprintln!("Runtime Error: tried to convert an invalid str to a number in line {}",error.line)
+        }
     }
 }

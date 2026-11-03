@@ -11,4 +11,6 @@ pub enum ErrorType{
     OutOfBound,
     InvalidType,
     DivisionByZero,
+    ReadError,
+    CannotConvertToNumber,
 }

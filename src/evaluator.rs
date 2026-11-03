@@ -1,5 +1,6 @@
 use crate::{array, calculator, evaluator_error, node, value, variable::{self, Variable}};
 use std::collections::HashMap;
+use std::io;
 
 //Function to start the evaluation
 pub fn evaluation(nodes:Vec<node::Node>)->Result<bool, evaluator_error::EvaluatorError>{
@@ -173,7 +174,16 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                 }
             }
             node::NodeType::ReadNode {format} => {
-                
+                match treatment_read(stack, &format){
+                    Ok(_) =>{}
+                    Err(error) => {
+                        let err=evaluator_error::EvaluatorError{
+                            kind:error,
+                            line:node.tokens[0].line
+                        };
+                        return Err(err);
+                    }
+                }
             }
         }
     }
@@ -206,6 +216,9 @@ fn print_traitment(stack:&mut Vec<value::Value>,mode:&bool)->bool{
     };
     //Printing the value that was in ther first position of the stack
     print!("{}",value.value.as_str());
+    //Flushing the output buffer
+    use std::io::Write;
+    std::io::stdout().flush().unwrap();
     true
 }
 //Function to make the traitment of the push value
@@ -458,5 +471,34 @@ fn operation_treatment(stack:&mut Vec<value::Value>,mode:&bool,node:&node::NodeT
     //Putting the value at the stack to have it
     stack.push(return_value);
     //Code for everything okey
+    Ok(true)
+}
+fn treatment_read(stack:&mut Vec<value::Value>,format:&value::ValueType)->Result<bool,evaluator_error::ErrorType>{
+    let mut val=value::Value{kind:format.clone(),value:String::from("")};
+    if !(val.is_a_number()||val.is_a_text()){
+        return Err(evaluator_error::ErrorType::InvalidType);
+    }
+    let mut input=String::new();
+    match io::stdin().read_line(&mut input) {
+        Ok(0) => {}
+        Ok(_) => {}
+        Err(_) => {
+            return Err(evaluator_error::ErrorType::ReadError);
+        }
+    }
+    input=input.trim_end_matches(&['\n', '\r'][..]).to_string();
+    if val.is_a_number(){
+        match input.parse::<f64>(){
+            Ok(_) =>{}
+            Err(_) =>{
+                return Err(evaluator_error::ErrorType::CannotConvertToNumber);
+            }
+        }
+        val=value::Value::set_as_number(input);
+    }
+    else{
+        val=value::Value::set_as_text(input);
+    }
+    stack.push(val);
     Ok(true)
 }
