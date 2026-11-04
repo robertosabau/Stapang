@@ -66,7 +66,7 @@ To create a variable or an array of this type, you must use `any` as the `type_o
 
 In Stapang, the following words are reserved:
 
-#### 2.4.1 True
+#### 2.4.1. True
 
 The word `true` is reserved for the boolean true value.
 
@@ -105,6 +105,7 @@ This instruction takes the value at the top of the stack and prints it on the sc
 
 The syntax of this instruction is as follows:
 * `print;`
+
 #### 3.1.4. Read
 
 This instruction allows you to read a value from the keyboard, determining the type of value you want to read.
@@ -180,9 +181,9 @@ The syntax of this instruction is as follows:
 ### 3.4. Comparison Operators
 #### 3.4.1. Equal
 
-This instruction takes the top two values from the stack and checks whether they are the same value, checking that they have the same type and value. In other words, `5` is not equal to `"5"`.
+This instruction takes the top two values from the stack and checks whether they are equal. Two values are considered equal only if they have the same type and the same value. For example, the number `5` and the string `"5"` are not considered equal.
 
-The resulting value is put on top of the stack.
+The resulting boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `equal;`
@@ -194,6 +195,8 @@ This instruction takes the top two values from the stack and checks whether one 
 
 In the case of strings, lexicographical comparison is used.
 
+The resulting boolean value is put on top of the stack.
+
 The syntax of this instruction is as follows:
 * `bigger;`
 
@@ -203,6 +206,8 @@ This instruction takes the top two values from the stack and checks whether one 
 * `first_value_of_stack < second_value_of_stack`
 
 In the case of strings, lexicographical comparison is used.
+
+The resulting boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `lower;`
@@ -214,6 +219,8 @@ This instruction takes the top two values from the stack and checks whether one 
 
 In the case of strings, lexicographical comparison is used.
 
+The resulting boolean value is put on top of the stack.
+
 The syntax of this instruction is as follows:
 * `biggerEqual;`
 
@@ -224,6 +231,8 @@ This instruction takes the top two values from the stack and checks whether one 
 
 In the case of strings, lexicographical comparison is used.
 
+The resulting boolean value is put on top of the stack.
+
 The syntax of this instruction is as follows:
 * `lowerEqual;`
 
@@ -232,7 +241,7 @@ The syntax of this instruction is as follows:
 
 This instruction takes the top two values from the stack and checks whether both values are true.
 
-The resulting value is put on top of the stack.
+The resulting boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `and;`
@@ -241,7 +250,7 @@ The syntax of this instruction is as follows:
 
 This instruction takes the top two values from the stack and checks whether at least one of the values is true.
 
-The resulting value is put on top of the stack.
+The resulting boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `or;`
@@ -250,7 +259,7 @@ The syntax of this instruction is as follows:
 
 This instruction takes the value at the top of the stack and, if it is a boolean value, returns its complement.
 
-The resulting value is put on top of the stack.
+The resulting boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `not;`
@@ -290,9 +299,7 @@ This instruction allows you to change the value of the safe mode.
 
 The syntax of this instruction is as follows:
 * `safe boolean_value;`
-
-##### 3.7.1.1. What is Safe Mode?
-
+#### 3.7.2 Safe Mode
 The safe mode is a runtime configuration that can be changed during the execution of the program. It allows the programmer to determine whether errors should be raised or whether some errors that would otherwise terminate execution should be ignored.
 
 By default, this mode is enabled, which means that errors are raised. If it is set to false using the safe instruction, the throwing of some runtime errors will be disabled.
