@@ -163,7 +163,7 @@ fn is_keyword(list: &mut Vec<tokens::Token>,text: &String,_line: usize)->bool{
 }
 fn is_invalid_caracter(caracter: char)->bool{
     match caracter{
-        c if c.is_alphanumeric()||is_comentery(c)||is_usefull_special_caracter(c) => false,
+        c if c.is_alphanumeric()||is_comentery(c)||is_usefull_special_caracter(c)||c=='-'||c=='_' => false,
         _=>true,
     }
 }
