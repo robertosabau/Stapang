@@ -291,7 +291,7 @@ This instruction allows you to change the value of the safe mode.
 The syntax of this instruction is as follows:
 * `safe boolean_value;`
 
-##### 3.7.1.1. What is the safe mode?
+##### 3.7.1.1. What is Safe Mode?
 
 The safe mode is a runtime configuration that can be changed during the execution of the program. It allows the programmer to determine whether errors should be raised or whether some errors that would otherwise terminate execution should be ignored.
 
