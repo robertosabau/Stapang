@@ -114,7 +114,7 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
                     }
                 }
             },
-            tokens::TokenType::Save=>{
+            tokens::TokenType::Safe=>{
                 match is_save(&mut token,&tokens,&mut index){
                     Ok(node)=>{
                         *index+=1;
@@ -383,7 +383,7 @@ fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
     }
     node_tokens.push(tokens[*index].clone());
     node=node::Node{
-        kind: node::NodeType::SaveNode { value:value },
+        kind: node::NodeType::SafeNode { value:value },
         tokens: node_tokens,
     };
     Ok(node)

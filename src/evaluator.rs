@@ -11,13 +11,13 @@ pub fn evaluation(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluato
     //The stack of the system
     let mut stack:Vec<value::Value>=Vec::new();
     //Boolean for the save_mode
-    let mut save_mode:bool=true;
+    let mut safe_mode:bool=true;
     //Checking if there is an save instruction
-    if nodes.iter().any(|n| matches!(n.kind, node::NodeType::SaveNode { .. })) {
+    if nodes.iter().any(|n| matches!(n.kind, node::NodeType::SafeNode { .. })) {
         //Warning to advice that during the execution of the program the save mode is changed
         println!("WARNING: Save mode will change during execution. Results may be unpredictable and errors harder to trace.");
     }
-    match evaluate_nodes(nodes,&mut variables,&mut arrays,&mut stack,&mut save_mode){
+    match evaluate_nodes(nodes,&mut variables,&mut arrays,&mut stack,&mut safe_mode){
         Ok(boolean)=>{
             return Ok(boolean);
         }
@@ -27,14 +27,14 @@ pub fn evaluation(nodes:Vec<node::Node>)->Result<bool, evaluator_error::Evaluato
     }
 }
 //Function to send the node where it has to go
-fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable::Variable>,arrays:&mut HashMap<String,array::Array>,mut stack:&mut Vec<value::Value>,save_mode:&mut bool)->Result<bool, evaluator_error::EvaluatorError>{
+fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable::Variable>,arrays:&mut HashMap<String,array::Array>,mut stack:&mut Vec<value::Value>,safe_mode:&mut bool)->Result<bool, evaluator_error::EvaluatorError>{
     //For to pass around every node
     for node in nodes{
         match node.kind{
             node::NodeType::AddNode|node::NodeType::AndNode|node::NodeType::BigEquNode|node::NodeType::BigNode|node::NodeType::DivNode
             |node::NodeType::EquNode|node::NodeType::LowEquNode|node::NodeType::SubNode|node::NodeType::MultNode|node::NodeType::ModNode
             |node::NodeType::LowNode|node::NodeType::OrNode|node::NodeType::NotNode =>{
-                match operation_treatment(&mut stack, &save_mode, &node.kind){
+                match operation_treatment(&mut stack, &safe_mode, &node.kind){
                     Ok(_) => continue,
                     Err(error) =>{
                         let error=evaluator_error::EvaluatorError{
@@ -56,13 +56,13 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                 return Ok(false);
             }
             node::NodeType::Popnode { array,position,name } =>{
-                match pop_traitment(variables, arrays, stack, save_mode, &name, &array, &position){
+                match pop_traitment(variables, arrays, stack, safe_mode, &name, &array, &position){
                     Ok(_) =>{}
                     Err(error) =>return Err(evaluator_error::EvaluatorError{kind:error,line:node.tokens[0].line}),
                 }
             }
             node::NodeType::Pushnode { .. } =>{
-                match push_traitment(&mut stack, &save_mode, &node.kind, &variables, &arrays){
+                match push_traitment(&mut stack, &safe_mode, &node.kind, &variables, &arrays){
                     Ok(_) => continue,
                     Err(error) => {
                         let err=evaluator_error::EvaluatorError{
@@ -74,7 +74,7 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                 }
             }
             node::NodeType::PrintNode =>{
-                if !print_traitment(&mut stack, &save_mode){
+                if !print_traitment(&mut stack, &safe_mode){
                     let error=evaluator_error::EvaluatorError{
                         kind:evaluator_error::ErrorType::StackEmpty,
                         line:node.tokens[0].line,
@@ -87,7 +87,7 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                 let value=match stack.pop(){
                     Some(value) => value,
                     None =>{
-                        if *save_mode{
+                        if *safe_mode{
                             return Err(evaluator_error::EvaluatorError {
                                 kind: evaluator_error::ErrorType::StackEmpty,
                                 line: node.tokens[0].line 
@@ -105,14 +105,14 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                 }
                 //Executing instruction in case of true
                 if value.is_a_true(){
-                    match evaluate_nodes(instructions, variables, arrays, stack, save_mode){
+                    match evaluate_nodes(instructions, variables, arrays, stack, safe_mode){
                         Ok(_) => continue,
                         Err(error) => return Err(error),
                     }
                 }
                 //Executing instruction in case of false
                 else{
-                    match evaluate_nodes(else_instructions, variables, arrays, stack, save_mode){
+                    match evaluate_nodes(else_instructions, variables, arrays, stack, safe_mode){
                         Ok(_) => continue,
                         Err(error) => return Err(error),
                     }
@@ -123,7 +123,7 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                 let mut value=match stack.pop(){
                     Some(value) => value,
                     None =>{
-                        if *save_mode{
+                        if *safe_mode{
                             return Err(evaluator_error::EvaluatorError {
                                 kind: evaluator_error::ErrorType::StackEmpty,
                                 line: node.tokens[0].line 
@@ -141,7 +141,7 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                 }
                 //Entering a while if the value was a boolean true
                 while value.is_a_true(){
-                    match evaluate_nodes(instructions.clone(), variables, arrays, stack, save_mode){
+                    match evaluate_nodes(instructions.clone(), variables, arrays, stack, safe_mode){
                         Ok(_) =>{}
                         Err(error) => return Err(error),
                     }
@@ -149,7 +149,7 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                     value=match stack.pop(){
                         Some(value) => value,
                         None =>{
-                            if *save_mode{
+                            if *safe_mode{
                                 return Err(evaluator_error::EvaluatorError {
                                     kind: evaluator_error::ErrorType::StackEmpty,
                                     line: node.tokens[0].line 
@@ -167,8 +167,8 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
                 //Saving the variable at the hashmap for variable
                 variables.insert(name,var);
             }
-            node::NodeType::SaveNode { value } =>{
-                if !save_traitment(&value, save_mode){
+            node::NodeType::SafeNode { value } =>{
+                if !safe_traitment(&value, safe_mode){
                     let error=evaluator_error::EvaluatorError{
                         kind:evaluator_error::ErrorType::BooleanExpected,
                         line: node.tokens[0].line,
@@ -193,7 +193,7 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
     Ok(true)
 }
 //Function to make the traitment of the save instruction
-fn save_traitment(value:&value::Value,mode:&mut bool)->bool{
+fn safe_traitment(value:&value::Value,mode:&mut bool)->bool{
     //Cases for the value intruduced
     if value.is_a_true(){
         *mode=true;
