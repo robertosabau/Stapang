@@ -1,5 +1,24 @@
 # Stapang
 
+## Table of Contents
+
+1. [What is Stapang?](#1-what-is-stapang)
+2. [Getting Started](#2-getting-started)
+   - [Basic Syntax](#21-basic-syntax)
+   - [Comments](#22-comments)
+   - [Data Types](#23-data-types)
+   - [Reserved Words](#24-reserved-words)
+3. [Instructions](#3-instructions)
+   - [Stack and Data Management](#31-stack-and-data-management)
+   - [Variables and Arrays](#32-variables-and-arrays)
+   - [Arithmetic Operators](#33-arithmetic-operators)
+   - [Comparison Operators](#34-comparison-operators)
+   - [Logical Operators](#35-logical-operators)
+   - [Control Flow](#36-control-flow)
+   - [Runtime Configuration](#37-runtime-configuration)
+4. [Runtime Errors](#4-runtime-errors)
+5. [Examples](#5-examples)
+
 ## 1. What is Stapang?
 
 Stapang is an interpreted, strongly typed, stack-based programming language. All operations are performed through a stack, which acts as the central mechanism for handling and manipulating values.
@@ -157,7 +176,7 @@ The resulting value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `mod;`
-### 3.4. Comparation Operators
+### 3.4. Comparison Operators
 #### 3.4.1. Equal
 
 This instruction takes the top two values from the stack and checks whether they are the same value, checking that they have the same type and value. In other words, `5` is not equal to `"5"`.
