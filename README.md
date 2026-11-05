@@ -9,6 +9,7 @@
    - [Comments](#22-comments)
    - [Data Types](#23-data-types)
    - [Reserved Words](#24-reserved-words)
+   - [Data Structures](#25-data-structures)
 3. [Instructions](#3-instructions)
    - [Stack and Data Management](#31-stack-and-data-management)
    - [Variables and Arrays](#32-variables-and-arrays)
@@ -77,6 +78,16 @@ The word `false` is reserved for the boolean false value.
 #### 2.4.3. Null
 
 The word `null` is reserved to prevent its use as an identifier.
+
+### 2.5. Data Structures
+
+#### 2.5.1. Variables
+
+A variable is a reserved space in memory used to store a value.
+
+#### 2.5.2. Arrays
+
+An array is a collection of n reserved memory positions, each used to store a value.
 
 ## 3. Instructions
 
