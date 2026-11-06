@@ -18,7 +18,9 @@
    - [Logical Operators](#35-logical-operators)
    - [Control Flow](#36-control-flow)
    - [Runtime Configuration](#37-runtime-configuration)
-4. [Runtime Errors](#4-runtime-errors)
+4. [Errors](#4-errors)
+   - [Syntax Errors](#41-syntax-errors)
+   - [Runtime Errors](#42-runtime-errors)
 5. [Examples](#5-examples)
 
 ## 1. What is Stapang?
@@ -302,6 +304,7 @@ while{
   instructions
 }
 ```
+
 ### 3.7. Runtime Configuration
 
 #### 3.7.1. Safe
@@ -310,6 +313,7 @@ This instruction allows you to change the value of the safe mode.
 
 The syntax of this instruction is as follows:
 * `safe boolean_value;`
+
 #### 3.7.2 Safe Mode
 The safe mode is a runtime configuration that can be changed during the execution of the program. It allows the programmer to determine whether errors should be raised or whether some errors that would otherwise terminate execution should be ignored.
 
@@ -318,3 +322,71 @@ By default, this mode is enabled, which means that errors are raised. If it is s
 The presence of any safe instruction will trigger a warning before execution starts.
 
 When the safe mode is disabled, errors are replaced by values such as Null or NaN.
+
+## 4. Errors
+
+### 4.1. Syntax Errors
+
+Syntax errors occur while the interpreter is analyzing the code, before execution, due to invalid syntax.
+
+These errors are always enabled and are not affected by Safe Mode.
+
+#### 4.1.1. Unterminated String Error
+
+This error occurs when a string literal is not properly closed with the character `"`.
+
+#### 4.1.2. Invalid Character Error
+
+This error occurs when a character that is not allowed in the language syntax is detected. An example would be `$`.
+
+#### 4.1.3. Invalid Identifier Error
+
+This error occurs when an identifier used for a variable or an array contains an invalid character.
+
+#### 4.1.4. Keyword Expected Error
+
+This error occurs when the interpreter expects an instruction to begin with a keyword but does not find a valid one.
+
+#### 4.1.5. Value Expected Error
+
+This error occurs when an instruction requires a value, but no value is provided. This includes explicit values and references to variables or arrays.
+
+#### 4.1.6. Semicolon Expected Error
+
+This error occurs when an instruction is not terminated with a `;`.
+
+#### 4.1.7. Opening Bracket Expected Error
+
+This error occurs when an instruction, such as `arr`, expects an opening bracket `[` but does not find one.
+
+#### 4.1.8. Closing Bracket Expected Error
+
+This error occurs when an instruction expects a closing bracket `]` but does not find one.
+
+#### 4.1.9. Number Expected Error
+
+This error occurs when an instruction expects a numeric value but does not find one.
+
+#### 4.1.10. Boolean Expected Error
+
+This error occurs when an instruction expects a Boolean value but does not find one.
+
+There is another error with the same name among the runtime errors, but its purpose is different.
+
+#### 4.1.11. Opening Brace Expected Error
+
+This error occurs when an instruction expects an opening brace `{` but does not find one.
+
+#### 4.1.12. Closing Brace Expected Error
+
+This error occurs when an instruction expects a closing brace `}` but does not find one.
+
+#### 4.1.13. Colon Expected Error
+
+This error occurs when an instruction expects a colon `:` but does not find one.
+
+#### 4.1.14. Type Expected Error
+
+This error occurs when an instruction expects a data type but does not find one.
+
+### 4.2 Runtime Errors
