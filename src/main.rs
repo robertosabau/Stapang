@@ -69,10 +69,10 @@ fn main() {
 fn show_lexer_error(error:LexerError){
     match error.kind{
         lexer_error::ErrorType::UnclosedString=>{
-            eprintln!("Syntax Error: Unclosed String found in line {}",error.line);
+            eprintln!("Syntax Error: Unterminated String found in line {}",error.line);
         },
         lexer_error::ErrorType::InvalidCharacter=>{
-            eprintln!("Syntax Error: A invalid caracter found in line {}",error.line);
+            eprintln!("Syntax Error: A invalid character found in line {}",error.line);
         }
         lexer_error::ErrorType::InvalidIndentifier=>{
             eprintln!("Syntax Error: A invalid identifier found in line {}",error.line);
@@ -82,7 +82,7 @@ fn show_lexer_error(error:LexerError){
 fn show_parser_error(error:ParserError){
     match error.kind{
         parser_error::ErrorType::KeyWorldExpected=>{
-            eprintln!("Syntax Error: An keyworld was expeted in line {}",error.line);
+            eprintln!("Syntax Error: An keyword was expeted in line {}",error.line);
         }
         parser_error::ErrorType::ValueExcepted=>{
             eprintln!("Syntax Error: An value was expected in line {}",error.line);
