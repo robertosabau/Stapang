@@ -17,7 +17,6 @@
    - [Comparison Operators](#34-comparison-operators)
    - [Logical Operators](#35-logical-operators)
    - [Control Flow](#36-control-flow)
-   - [Runtime Configuration](#37-runtime-configuration)
 4. [Errors](#4-errors)
    - [Syntax Errors](#41-syntax-errors)
    - [Runtime Errors](#42-runtime-errors)
@@ -305,31 +304,11 @@ while{
 }
 ```
 
-### 3.7. Runtime Configuration
-
-#### 3.7.1. Safe
-
-This instruction allows you to change the value of the safe mode.
-
-The syntax of this instruction is as follows:
-* `safe boolean_value;`
-
-#### 3.7.2 Safe Mode
-The safe mode is a runtime configuration that can be changed during the execution of the program. It allows the programmer to determine whether errors should be raised or whether some errors that would otherwise terminate execution should be ignored.
-
-By default, this mode is enabled, which means that errors are raised. If it is set to false using the safe instruction, the throwing of some runtime errors will be disabled.
-
-The presence of any safe instruction will trigger a warning before execution starts.
-
-When the safe mode is disabled, errors are replaced by values such as Null or NaN.
-
 ## 4. Errors
 
 ### 4.1. Syntax Errors
 
 Syntax errors occur while the interpreter is analyzing the code, before execution, due to invalid syntax.
-
-These errors are always enabled and are not affected by Safe Mode.
 
 #### 4.1.1. Unterminated String Error
 
