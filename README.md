@@ -346,25 +346,19 @@ This error occurs when an instruction expects a closing bracket `]` but does not
 
 This error occurs when an instruction expects a numeric value but does not find one.
 
-#### 4.1.10. Boolean Expected Error
-
-This error occurs when an instruction expects a Boolean value but does not find one.
-
-There is another error with the same name among the runtime errors, but its purpose is different.
-
-#### 4.1.11. Opening Brace Expected Error
+#### 4.1.10. Opening Brace Expected Error
 
 This error occurs when an instruction expects an opening brace `{` but does not find one.
 
-#### 4.1.12. Closing Brace Expected Error
+#### 4.1.11. Closing Brace Expected Error
 
 This error occurs when an instruction expects a closing brace `}` but does not find one.
 
-#### 4.1.13. Colon Expected Error
+#### 4.1.12. Colon Expected Error
 
 This error occurs when an instruction expects a colon `:` but does not find one.
 
-#### 4.1.14. Type Expected Error
+#### 4.1.13. Type Expected Error
 
 This error occurs when an instruction expects a data type but does not find one.
 
