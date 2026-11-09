@@ -3,8 +3,8 @@ use crate::node;
 use crate::parser_error;
 use crate::tokens::TokenType;
 use crate::value;
-use crate::value::ValueType;
 use crate::value_source;
+use crate::variable;
 //Funtion to start the parsing
 pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error::ParserError>{
     let mut node_list:Vec<node::Node>=Vec::new();
@@ -128,9 +128,9 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
 fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
-    let mut num:String=String::from("0");
+    let num:String;
     let name;
-    let mut is_array = false;
+    let kind:value_source::Identifier;
     //Checking if their is an identifier to get where to put the value of the stack
     if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
@@ -142,7 +142,6 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     name=token.value.clone();
     //Checking if there is the identifier is for an array
     if check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
-        is_array=true;
         //Checking if there is the number of the position in the array
         if !check_if_is_token(tokens::TokenType::Num,token,tokens,index,&mut node_tokens){
             let error=parser_error::ParserError{
@@ -160,9 +159,11 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
             };
             return Err(error);
         }
+        kind=value_source::Identifier::Array { name, position:Box::new(value_source::ValueSource::Literal(value::Value::set_as_number(num.parse::<f64>().unwrap()))) }
     }
     else {
         *index -= 1;
+        kind=value_source::Identifier::Variable(name)
     }
     //Checking if the sentence is closed with a semicolon, the end of the sentence
     if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
@@ -174,7 +175,8 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     }
     node_tokens.push(tokens[*index].clone());
     node=node::Node{
-        kind: node::NodeType::Popnode{array:is_array,position:num.parse().unwrap(),name: name},
+        kind: 
+        node::NodeType::Popnode{ide:kind},
         tokens: node_tokens,
     };
     return Ok(node);
@@ -204,7 +206,7 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
             node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_false())}
         },
         tokens::TokenType::Num=>{
-            node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_number(token.value.clone()))}
+            node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_number(token.value.clone().parse::<f64>().unwrap()))}
         }
         tokens::TokenType::Str=>{
             node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_text(token.value.clone()))}
@@ -231,7 +233,7 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
                     };
                     return Err(error);
                 }
-                node=node::NodeType::Pushnode { value: value_source::ValueSource::Identifier(value_source::Identifier::Array { name, position:Box::new(value_source::ValueSource::Literal(value::Value::set_as_number(num)))})}
+                node=node::NodeType::Pushnode { value: value_source::ValueSource::Identifier(value_source::Identifier::Array { name, position:Box::new(value_source::ValueSource::Literal(value::Value::set_as_number(num.parse::<f64>().unwrap())))})}
             }
             else{
                 *index-=1;
@@ -343,7 +345,7 @@ fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
     let name:String;
-    let mut kind:ValueType=ValueType::Null;
+    let mut kind=variable::VariableType::Any;
     //Checking if their is an identifier
     if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
@@ -393,7 +395,7 @@ fn is_arr(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     let node: node::Node;
     let name:String;
     let num:String;
-    let mut kind:ValueType=ValueType::Null;
+    let mut kind=variable::VariableType::Any;
     //Checking if their is an identifier
     if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{
@@ -648,16 +650,16 @@ fn there_is_a_token(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &
     }
 }
 //Function to check if there is a type of data
-fn there_is_a_type(kind:&mut ValueType,token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
+fn there_is_a_type(kind:&mut variable::VariableType,token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize,node_tokens:&mut Vec<tokens::Token>)->bool{
     if !there_is_a_token(token, tokens, index,node_tokens){
         return false;
     }
     //Checking if the tokens is a type of data
     match token.kind{
-        TokenType::NumType=>*kind=ValueType::Number,
-        TokenType::StrType=>*kind=ValueType::Text,
-        TokenType::BoolType=>*kind=ValueType::Boolean,
-        TokenType::AnyType=>*kind=ValueType::Any,
+        TokenType::NumType=>*kind=variable::VariableType::Number,
+        TokenType::StrType=>*kind=variable::VariableType::Text,
+        TokenType::BoolType=>*kind=variable::VariableType::Boolean,
+        TokenType::AnyType=>*kind=variable::VariableType::Any,
         _=>{
             return false;
         }
@@ -679,7 +681,7 @@ fn there_is_a_value(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &
 fn is_read(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize)->Result<node::Node,parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
-    let mut kind:ValueType=ValueType::Null;
+    let mut kind:variable::VariableType=variable::VariableType::Any;
     //Checking if there is an type for the array
     if !there_is_a_type(&mut kind, token, tokens, index, &mut node_tokens){
         let error=parser_error::ParserError{

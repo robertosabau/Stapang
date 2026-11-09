@@ -1,12 +1,13 @@
 use crate::{ evaluator_error::{self}, value};
+use crate::variable;
 pub struct Array{
-    kind: value::ValueType,
+    kind: variable::VariableType,
     values: Vec<value::Value>,
     positions:usize,
 }
 impl Array {
     //Constructor of a Array
-    pub fn new(kind:value::ValueType,position:usize)->Self{
+    pub fn new(kind:variable::VariableType,position:usize)->Self{
         Self { 
             kind,
             values:vec![value::Value::set_as_null();
@@ -18,18 +19,12 @@ impl Array {
         if position>=self.positions{
             return Err(evaluator_error::ErrorType::OutOfBound);
         }
-        match value.kind{
-            value::ValueType::Null=>{
-                self.values[position]=value;
-                return Ok(true);
-            }
-            _=>{
-                if self.kind==value::ValueType::Any||self.kind==value.kind{
-                    self.values[position]=value;
-                    return Ok(true);
-                }
-                Err(evaluator_error::ErrorType::InvalidValue)
-            }
+        if self.is_compatible(value.kind.clone()){
+            self.values[position]=value;
+            return Ok(true);
+        }
+        else{
+            return Err(evaluator_error::ErrorType::InvalidValue);
         }
     }
     //Function to get the value
@@ -39,5 +34,19 @@ impl Array {
             return Err(0);
         }
         Ok(self.values[position].clone())
+    }
+    //Function to check if is compatible the value with the variable
+    fn is_compatible(&self, kind:value::ValueType)->bool{
+        //Case of null, perfect
+        if kind==value::ValueType::Null{
+            return true;
+        }
+        //Cases of every type
+        match self.kind{
+            variable::VariableType::Text => return matches!(kind, value::ValueType::Text(_)),
+            variable::VariableType::Number => return matches!(kind, value::ValueType::Number(_)),
+            variable::VariableType::Boolean => return matches!(kind, value::ValueType::Boolean(_)),
+            variable::VariableType::Any => return true,
+        }
     }
 }

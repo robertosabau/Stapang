@@ -1,70 +1,67 @@
 #[derive(Clone,PartialEq,Debug)]
 pub struct Value{
     pub kind: ValueType,
-    pub value: String,
 }
 #[derive(PartialEq,Clone,Debug)]
 pub enum ValueType{
-    Text,
-    Number,
-    Boolean,
+    Text(String),
+    Number(f64),
+    Boolean(bool),
     Null,
-    Any
 }
 impl Value{
     //Create a true value
     pub fn set_as_true()->Self{
         Self {
-            kind: ValueType::Boolean,
-            value: String::from("True")
+            kind: ValueType::Boolean(true),
         }
     }
     //Checking if it is a true
     pub fn is_a_true(&self)->bool{
-        matches!(self.kind,ValueType::Boolean) && self.value == "True"
+        matches!(self.kind,ValueType::Boolean(true))
     }
     //Create a false value
     pub fn set_as_false()->Self{
         Self {
-            kind: ValueType::Boolean,
-            value: String::from("False")
+            kind: ValueType::Boolean(false),
         }
     }
     //Checking if it is a false
     pub fn is_a_false(&self)->bool{
-        matches!(self.kind,ValueType::Boolean) && self.value == "False"
+        matches!(self.kind,ValueType::Boolean(false))
     }
     //Create a null value
     pub fn set_as_null()->Self{
         Self {
-            kind: ValueType::Null,
-            value: String::from("Null")
+            kind: ValueType::Null
         }
+    }
+    //Create a boolean
+    pub fn set_as_bool(value:bool)->Self{
+        Self { kind: ValueType::Boolean(value) }
     }
     //Checking if it is a null
     pub fn is_a_null(&self)->bool{
         matches!(self.kind,ValueType::Null)
     }
     //Create a number value
-    pub fn set_as_number(value:String)->Self{
+    pub fn set_as_number(value:f64)->Self{
         Self {
-            kind: ValueType::Number,
-            value,
+            kind: ValueType::Number(value)
         }
     }
     //Checking if it is a number
     pub fn is_a_number(&self)->bool{
-        matches!(self.kind,ValueType::Number)
+        matches!(self.kind,ValueType::Number(..))
     }
     //Create a text value
     pub fn set_as_text(value:String)->Self{
         Self {
-            kind: ValueType::Text,
-            value,
+            kind: ValueType::Text(value)
         }
     }
     //Checking if it is a text
     pub fn is_a_text(&self)->bool{
-        matches!(self.kind,ValueType::Text)
+        matches!(self.kind,ValueType::Text(..))
     }
 }

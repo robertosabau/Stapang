@@ -1,7 +1,6 @@
 use crate::tokens;
-use crate::value;
-use crate::value::ValueType;
 use crate::value_source;
+use crate::variable;
 
 #[derive(PartialEq,Clone,Debug)]
 pub struct Node{
@@ -11,14 +10,14 @@ pub struct Node{
 #[derive(PartialEq,Clone,Debug)]
 pub enum NodeType{
     VoidNode, //Node for the case their is not else instruction in the if node
-    Popnode {array:bool,position:usize,name: String}, //Node for Pop instruction
+    Popnode {ide:value_source::Identifier}, //Node for Pop instruction
     Pushnode {value:value_source::ValueSource}, //Node for push instruction
     PrintNode, //Node for print instruction
     IfNode{instructions:Vec<Node>,else_instructions:Vec<Node>}, //Node for if instruction
     WhileNode{instructions:Vec<Node>}, //Node for while instruction
-    VarNode {name: String,kind:ValueType}, //Node for var instruction
-    ArrNode {name: String,positions:String,kind:ValueType},//Node for arr instruction
-    ReadNode {format:value::ValueType}, //Node for read instruction
+    VarNode {name: String,kind:variable::VariableType}, //Node for var instruction
+    ArrNode {name: String,positions:String,kind:variable::VariableType},//Node for arr instruction
+    ReadNode {format:variable::VariableType}, //Node for read instruction
     AddNode, //Node for add instruction
     SubNode, //Node for sub instruction
     MultNode, //Node for mult instruction

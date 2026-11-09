@@ -48,8 +48,8 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
             node::NodeType::VoidNode=>{
                 return Ok(false);
             }
-            node::NodeType::Popnode { array,position,name } =>{
-                match pop_traitment(variables, arrays, stack, &name, &array, &position){
+            node::NodeType::Popnode { ide } =>{
+                match pop_traitment(variables, arrays, stack,ide){
                     Ok(_) =>{}
                     Err(error) =>return Err(evaluator_error::EvaluatorError{kind:error,line:node.tokens[0].line}),
                 }
@@ -177,8 +177,14 @@ fn print_traitment(stack:&mut Vec<value::Value>)->bool{
             return false;
         }
     };
+    let text=match value.kind{
+        value::ValueType::Text(text) =>text,
+        value::ValueType::Number(num) =>num.to_string(),
+        value::ValueType::Boolean(bool) =>bool.to_string(),
+        value::ValueType::Null => return false,
+    };
     //Printing the value that was in ther first position of the stack
-    print!("{}",value.value.as_str());
+    print!("{}",text);
     //Flushing the output buffer
     use std::io::Write;
     std::io::stdout().flush().unwrap();
@@ -222,13 +228,25 @@ fn push_traitment(stack:&mut Vec<value::Value>,node:&node::NodeType,variables:&H
                         //Code for array do not found
                         return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
                     }
-                    
+                    //Variable for the usize
+                    let mut index:usize=0;
+                    //Getting the position
+                    match &**position{
+                        value_source::ValueSource::Literal(val) =>{
+                            if let value::ValueType::Number(num)=val.kind{
+                                if num.clone().is_finite() && num >= 0.0 && num.clone().fract() == 0.0{
+                                    index=num as usize;
+                                }
+                            }
+                        }
+                        value_source::ValueSource::Identifier(identifier) =>{},
+                    }
                     //Push the value in the variable if exists
                     if let Some(array) = arrays.get(name) {
-                        match array.get_value(position.unwrap()){
+                        match array.get_value(index.clone()){
                             Ok(value)=>{
                                 if value.is_a_null(){
-                                    return Err(evaluator_error::ErrorType::ArrayNotInicializated { name:name.clone(),position:position.unwrap()});
+                                    return Err(evaluator_error::ErrorType::ArrayNotInicializated { name:name.clone(),position:index});
                                 }
                                 stack.push(value);
                                 return Ok(true);
@@ -239,10 +257,14 @@ fn push_traitment(stack:&mut Vec<value::Value>,node:&node::NodeType,variables:&H
                             }
                         }
                     }
+                    else{
+                        return Err(evaluator_error::ErrorType::InternarError);
+                    }
                 }
             }
-            //Checking if is a array to get the values
-            if let value_source::Identifier::Array { name, position }
+        }
+        else{
+            Err(evaluator_error::ErrorType::InternarError)
         }
         //Continue in case there is only a variable, checking if the variable is defined
     }
@@ -308,14 +330,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,node:&node::NodeType)->Resul
                         return_value=value;
                     }
                     Err(type_error) =>{
-                        if type_error{
-                            //code for invalid type
-                            return Err(evaluator_error::ErrorType::DivisionByZero);
-                        }
-                        else{
-                            //Code for matematical error
-                            return Err(evaluator_error::ErrorType::InvalidType);
-                        }
+                        return Err(type_error);
                     }
                 }
             }
@@ -327,14 +342,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,node:&node::NodeType)->Resul
                     }
                     //Returning code for invalid type
                     Err(type_error) =>{
-                        if type_error{
-                            //code for invalid type
-                            return Err(evaluator_error::ErrorType::DivisionByZero);
-                        }
-                        else{
-                            //Code for matematical error
-                            return Err(evaluator_error::ErrorType::InvalidType);
-                        }
+                        return Err(type_error);
                     }
                 }
             }
@@ -380,7 +388,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,node:&node::NodeType)->Resul
             }
             //lower
             node::NodeType::LessNode=>{
-                match calculator::lower(&val1,&val2){
+                match calculator::less(&val1,&val2){
                     Ok(value) =>{
                         return_value=value;
                     }
@@ -401,7 +409,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,node:&node::NodeType)->Resul
             }
             //lower or equal
             node::NodeType::LessEquNode=>{
-                match calculator::lower_equal(&val1,&val2){
+                match calculator::less_equal(&val1,&val2){
                     Ok(value) =>{
                         return_value=value;
                     }
@@ -429,9 +437,9 @@ fn operation_treatment(stack:&mut Vec<value::Value>,node:&node::NodeType)->Resul
     //Code for everything okey
     Ok(true)
 }
-fn treatment_read(stack:&mut Vec<value::Value>,format:&value::ValueType)->Result<bool,evaluator_error::ErrorType>{
-    let mut val=value::Value{kind:format.clone(),value:String::from("")};
-    if !(val.is_a_number()||val.is_a_text()){
+fn treatment_read(stack:&mut Vec<value::Value>,format:&variable::VariableType)->Result<bool,evaluator_error::ErrorType>{
+    let val;
+    if !(format.valid_to_read()){
         return Err(evaluator_error::ErrorType::InvalidType);
     }
     let mut input=String::new();
@@ -443,14 +451,15 @@ fn treatment_read(stack:&mut Vec<value::Value>,format:&value::ValueType)->Result
         }
     }
     input=input.trim_end_matches(&['\n', '\r'][..]).to_string();
-    if val.is_a_number(){
+    if *format==variable::VariableType::Number{
         match input.parse::<f64>(){
-            Ok(_) =>{}
+            Ok(number) =>{
+                val=value::Value::set_as_number(number);
+            }
             Err(_) =>{
                 return Err(evaluator_error::ErrorType::CannotConvertToNumber);
             }
         }
-        val=value::Value::set_as_number(input);
     }
     else{
         val=value::Value::set_as_text(input);
@@ -458,29 +467,48 @@ fn treatment_read(stack:&mut Vec<value::Value>,format:&value::ValueType)->Result
     stack.push(val);
     Ok(true)
 }
-fn pop_traitment(variables:&mut HashMap<String, variable::Variable>,arrays:&mut HashMap<String, array::Array>,stack:&mut Vec<value::Value>,name:&String,array:&bool,position:&usize)->Result<bool, evaluator_error::ErrorType>{
+fn pop_traitment(variables:&mut HashMap<String, variable::Variable>,arrays:&mut HashMap<String, array::Array>,stack:&mut Vec<value::Value>,ide:value_source::Identifier)->Result<bool, evaluator_error::ErrorType>{
     let val = match stack.pop() {
         Some(value) => value,
         None => {
                 return Err(evaluator_error::ErrorType::StackEmpty);
         }
     };
-    if *array{
-        if !arrays.contains_key(name){
-            return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
+    match ide{
+        value_source::Identifier::Variable(name) =>{
+            if !variables.contains_key(&name){
+                return Err(evaluator_error::ErrorType::VariableNotDefined { name:name.clone() });
+            }
+            let variable:&mut variable::Variable=variables.get_mut(&name).unwrap();
+                if !variable.set_value(val){
+                    return Err(evaluator_error::ErrorType::InvalidValue);
+            }
+            return Ok(true);
         }
-        let array:&mut array::Array=arrays.get_mut(name).unwrap();
-        match array.set_value(val, position.clone()){
-            Ok(_) =>return Ok(true),
-            Err(error) =>return Err(error),
-        }
+        value_source::Identifier::Array { name, position } =>{
+            //Checking if the array was defined
+                if !arrays.contains_key(&name){
+                    //Code for array do not found
+                    return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
+                }
+                //Variable for the usize
+                let mut index:usize=0;
+                //Getting the position
+                match &*position{
+                    value_source::ValueSource::Literal(val) =>{
+                        if let value::ValueType::Number(num)=val.kind{
+                            if num.clone().is_finite() && num >= 0.0 && num.clone().fract() == 0.0{
+                                index=num as usize;
+                            }
+                        }
+                    }
+                    value_source::ValueSource::Identifier(identifier) =>{},
+                }
+                let array:&mut array::Array=arrays.get_mut(&name).unwrap();
+                match array.set_value(val, index){
+                    Ok(_) =>return Ok(true),
+                    Err(error) =>return Err(error),
+                }
+            }
     }
-    if !variables.contains_key(name){
-        return Err(evaluator_error::ErrorType::VariableNotDefined { name:name.clone() });
-    }
-    let variable:&mut variable::Variable=variables.get_mut(name).unwrap();
-    if !variable.set_value(val){
-        return Err(evaluator_error::ErrorType::InvalidValue);
-    }
-    Ok(true)
 }
