@@ -17,7 +17,6 @@ pub enum NodeType{
     WhileNode{instructions:Vec<Node>}, //Node for while instruction
     VarNode {name: String,kind:ValueType}, //Node for var instruction
     ArrNode {name: String,positions:String,kind:ValueType},//Node for arr instruction
-    SafeNode {value: value::Value}, //Node for safe instruction
     ReadNode {format:value::ValueType}, //Node for read instruction
     AddNode, //Node for add instruction
     SubNode, //Node for sub instruction

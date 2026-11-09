@@ -114,17 +114,6 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
                     }
                 }
             },
-            tokens::TokenType::Safe=>{
-                match is_save(&mut token,&tokens,&mut index){
-                    Ok(node)=>{
-                        *index+=1;
-                        return Ok(node);
-                    },
-                    Err(error)=>{
-                        return Err(error);
-                    }
-                }
-            },
             _=>{
                 let error=parser_error::ParserError{
                     kind: parser_error::ErrorType::KeyWorldExpected,
@@ -348,48 +337,6 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
 }
 /*
 keywold;
-*/
-fn is_save(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
-    let mut node_tokens:Vec<tokens::Token>=Vec::new();
-    let node: node::Node;
-    let value:value::Value;
-    //Checking if their is an value
-    if !there_is_a_token(token, tokens, index, &mut node_tokens){
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::BooleanExpected,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    if token.kind!=tokens::TokenType::True&&token.kind!=tokens::TokenType::False{
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::BooleanExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    value=match token.kind{
-        tokens::TokenType::True => value::Value::set_as_true(),
-        tokens::TokenType::False => value::Value::set_as_false(),
-        _ => value::Value::set_as_null(),
-    };
-    //Checking if the sentence is closed with a semicolon, the end of the sentence
-    if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
-         let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::SemiColonExpected ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    node_tokens.push(tokens[*index].clone());
-    node=node::Node{
-        kind: node::NodeType::SafeNode { value:value },
-        tokens: node_tokens,
-    };
-    Ok(node)
-}
-/*
-save boolean;
 */
 fn is_var(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();

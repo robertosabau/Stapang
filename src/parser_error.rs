@@ -9,7 +9,6 @@ pub enum ErrorType{
     OpenBracketExpected,
     CloseBrakectExpected,
     NumberExpected,
-    BooleanExpected,
     OpenCurvyBrackedExpected,
     CloseCurvyBrackedExpected,
     ColonExpected,

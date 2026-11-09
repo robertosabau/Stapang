@@ -16,7 +16,6 @@ pub enum TokenType{
     While, //Loop
     Var, //Declaration variable
     Arr, //Declaration array
-    Safe, //Modify save mode
     Read, //Read keyworld
     //Keyworld no instructions
     True, //Boolean true

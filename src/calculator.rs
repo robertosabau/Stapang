@@ -39,13 +39,13 @@ pub fn multiply(val1:&value::Value,val2:&value::Value)->Result<value::Value,bool
     Ok(value)
 }
 //Function to divide
-pub fn divide(val1:&value::Value,val2:&value::Value,mode:&bool)->Result<value::Value,bool>{
+pub fn divide(val1:&value::Value,val2:&value::Value)->Result<value::Value,bool>{
     //Checking if any of the two values is a null or a boolean or a text
     if !checking_type_matematical_operation(&val1.kind,&val2.kind,false){
         return Err(false);
     }
     //Checking if the value the second value is 0 and the save mode is on
-    if val2.value.parse::<f64>().unwrap()==0.0&&*mode{
+    if val2.value.parse::<f64>().unwrap()==0.0{
         return Err(true);
     }
     //Action in case of numbers, because this two values have to be a Number
@@ -54,13 +54,13 @@ pub fn divide(val1:&value::Value,val2:&value::Value,mode:&bool)->Result<value::V
     Ok(value)
 }
 //Function to make the module
-pub fn module(val1:&value::Value,val2:&value::Value,mode:&bool)->Result<value::Value,bool>{
+pub fn module(val1:&value::Value,val2:&value::Value)->Result<value::Value,bool>{
     //Checking if any of the two values is a null or a boolean or a text
     if !checking_type_matematical_operation(&val1.kind,&val2.kind,false){
         return Err(false);
     }
     //Checking if the value the second value is 0 and the save mode is on
-    if val2.value.parse::<f64>().unwrap()==0.0&&*mode{
+    if val2.value.parse::<f64>().unwrap()==0.0{
         return Err(true);
     }
     //Action in case of numbers, because this two values have to be a Number

@@ -140,7 +140,6 @@ fn is_keyword(list: &mut Vec<tokens::Token>,text: &String,_line: usize)->bool{
         "lower"=>token_kind=tokens::TokenType::Low,
         "biggerEqual"=>token_kind=tokens::TokenType::BigEqu,
         "lowerEqual"=>token_kind=tokens::TokenType::LowEqu,
-        "safe"=>token_kind=tokens::TokenType::Safe,
         "and"=>token_kind=tokens::TokenType::And,
         "or"=>token_kind=tokens::TokenType::Or,
         "not"=>token_kind=tokens::TokenType::Not,
