@@ -24,9 +24,9 @@ fn evaluate_nodes(nodes:Vec<node::Node>,variables:&mut HashMap<String, variable:
     //For to pass around every node
     for node in nodes{
         match node.kind{
-            node::NodeType::AddNode|node::NodeType::AndNode|node::NodeType::BigEquNode|node::NodeType::BigNode|node::NodeType::DivNode
-            |node::NodeType::EquNode|node::NodeType::LowEquNode|node::NodeType::SubNode|node::NodeType::MultNode|node::NodeType::ModNode
-            |node::NodeType::LowNode|node::NodeType::OrNode|node::NodeType::NotNode =>{
+            node::NodeType::AddNode|node::NodeType::AndNode|node::NodeType::GreaterEquNode|node::NodeType::GreaterNode|node::NodeType::DivNode
+            |node::NodeType::EquNode|node::NodeType::LessEquNode|node::NodeType::SubNode|node::NodeType::MultNode|node::NodeType::ModNode
+            |node::NodeType::LessNode|node::NodeType::OrNode|node::NodeType::NotNode =>{
                 match operation_treatment(&mut stack, &node.kind){
                     Ok(_) => continue,
                     Err(error) =>{
@@ -359,7 +359,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,node:&node::NodeType)->Resul
                 }
             }
             //Bigger
-            node::NodeType::BigNode=>{
+            node::NodeType::GreaterNode=>{
                 match calculator::greater(&val1,&val2){
                     Ok(value) =>{
                         return_value=value;
@@ -369,7 +369,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,node:&node::NodeType)->Resul
                 }
             }
             //lower
-            node::NodeType::LowNode=>{
+            node::NodeType::LessNode=>{
                 match calculator::lower(&val1,&val2){
                     Ok(value) =>{
                         return_value=value;
@@ -380,7 +380,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,node:&node::NodeType)->Resul
                 }
             }
             //bigger or equal
-            node::NodeType::BigEquNode=>{
+            node::NodeType::GreaterEquNode=>{
                 match calculator::greater_equal(&val1,&val2){
                     Ok(value) =>{
                         return_value=value;
@@ -390,7 +390,7 @@ fn operation_treatment(stack:&mut Vec<value::Value>,node:&node::NodeType)->Resul
                 }
             }
             //lower or equal
-            node::NodeType::LowEquNode=>{
+            node::NodeType::LessEquNode=>{
                 match calculator::lower_equal(&val1,&val2){
                     Ok(value) =>{
                         return_value=value;

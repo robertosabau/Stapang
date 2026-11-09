@@ -24,10 +24,10 @@ pub enum NodeType{
     DivNode, //Node for div instruction
     ModNode, //Node for mod instruction
     EquNode, //Node for equal instruction
-    BigNode, //Node for bigger instruction
-    LowNode, //Node for lower instruction
-    BigEquNode, //Node for biggerEqual instruction
-    LowEquNode, //Node for lowerEqual instruction
+    GreaterNode, //Node for bigger instruction
+    LessNode, //Node for lower instruction
+    GreaterEquNode, //Node for biggerEqual instruction
+    LessEquNode, //Node for lowerEqual instruction
     NotNode, //Node for not instruction
     AndNode, //Node for and instruction
     OrNode, //Node for or instruction

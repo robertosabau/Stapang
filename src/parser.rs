@@ -57,8 +57,8 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
             }
             tokens::TokenType::Print | tokens::TokenType::Add 
             | tokens::TokenType::Sub | tokens::TokenType::Mult | tokens::TokenType::Div
-            | tokens::TokenType::Equ | tokens::TokenType::Big | tokens::TokenType::Low
-            | tokens::TokenType::BigEqu| tokens::TokenType::LowEqu | tokens::TokenType::Not
+            | tokens::TokenType::Equ | tokens::TokenType::Greater | tokens::TokenType::Less
+            | tokens::TokenType::GreaterEqu| tokens::TokenType::LessEqu | tokens::TokenType::Not
             | tokens::TokenType::And | tokens::TokenType::Or=>{
                 match generic_comprobation(&token.kind.clone(), &mut token, &tokens, &mut index){
                     Ok(node)=>{
@@ -299,17 +299,17 @@ fn generic_comprobation(kind: &tokens::TokenType,token:&mut tokens::Token,tokens
         tokens::TokenType::Equ=>{
             node_kind=node::NodeType::EquNode;
         }
-        tokens::TokenType::Big=>{
-            node_kind=node::NodeType::BigNode;
+        tokens::TokenType::Greater=>{
+            node_kind=node::NodeType::GreaterNode;
         }
-        tokens::TokenType::Low=>{
-            node_kind=node::NodeType::LowNode;
+        tokens::TokenType::Less=>{
+            node_kind=node::NodeType::LessNode;
         }
-        tokens::TokenType::BigEqu=>{
-            node_kind=node::NodeType::BigEquNode;
+        tokens::TokenType::GreaterEqu=>{
+            node_kind=node::NodeType::GreaterEquNode;
         }
-        tokens::TokenType::LowEqu=>{
-            node_kind=node::NodeType::LowEquNode;
+        tokens::TokenType::LessEqu=>{
+            node_kind=node::NodeType::LessEquNode;
         }
         tokens::TokenType::Not=>{
             node_kind=node::NodeType::NotNode;

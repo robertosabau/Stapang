@@ -28,10 +28,10 @@ pub enum TokenType{
     Div, // /
     Mod, // %
     Equ, // =
-    Big, // >
-    Low, // <
-    BigEqu, //>=
-    LowEqu, //<=
+    Greater, // >
+    Less, // <
+    GreaterEqu, //>=
+    LessEqu, //<=
     Not, // Not
     And, //AND
     Or, //OR
