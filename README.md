@@ -1,6 +1,5 @@
 # Stapang
 
-
 ## Table of Contents
 
 1. [What is Stapang?](#1-what-is-stapang)
@@ -25,17 +24,21 @@
 ## 1. What is Stapang?
 
 Stapang is an interpreted, strongly typed, stack-based programming language. All operations are performed through a stack, which acts as the central mechanism for handling and manipulating values.
+
 ## 2. Getting Started
+
 ## 2.1. Basic Syntax
 
-There are two important rules to consider regarding the syntax of the programming language.
+There are two important rules to consider regarding the syntax of Stapang.
 
-The first one is that every instruction must end with a `;`.
+The first rule is that every instruction must end with a `;`.
 
-The second one is that this programming language is whitespace-insensitive. This means that you can write all the instructions on one line or use one line for each part of the instruction.
+The second rule is that Stapang is whitespace-insensitive. This means that you can write all the instructions on one line or use one line for each part of the instruction.
+
 ### 2.2. Comments
 
-There is only one type of comment: single-line comments. To write a comment, you must use the character `#`, which makes the interpreter ignore everything after it until the first `\n`.
+Stapang supports single-line comments. To write one, use the `#` character. The interpreter ignores everything after it until the next newline (`\n`).
+
 ### 2.3. Data Types
 
 The following types are available for variables and arrays in Stapang:
@@ -46,7 +49,7 @@ This type represents character strings encoded in UTF-8.
 
 To create a variable or an array of this type, you must use `str` as the `type_of_value_allowed`.
 
-#### 2.3.2. Number
+#### 2.3.2. Numbers
 
 This type represents double-precision floating-point numbers based on the IEEE 754-2008 standard.
 
@@ -54,13 +57,13 @@ To create a variable or an array of this type, you must use `num` as the `type_o
 
 #### 2.3.3. Boolean
 
-This type represents a classic boolean value that can only take two values: true or false.
+This type represents a Boolean value that can only have one of two possible values: `true` or `false`.
 
 To create a variable or an array of this type, you must use `bool` as the `type_of_value_allowed`.
 
 #### 2.3.4. Any
 
-This is not a type in itself. In fact, it is just a keyword that allows a variable or an array to take any possible value.
+`any` is not a data type itself. Instead, it is a keyword that allows a variable or an array to store values of any supported data type.
 
 To create a variable or an array of this type, you must use `any` as the `type_of_value_allowed`.
 
@@ -70,11 +73,11 @@ In Stapang, the following words are reserved:
 
 #### 2.4.1. True
 
-The word `true` is reserved for the boolean true value.
+The word `true` is reserved to represent the Boolean value `true`.
 
 #### 2.4.2. False
 
-The word `false` is reserved for the boolean false value.
+The word `false` is reserved to represent the Boolean value `false`.
 
 #### 2.4.3. Null
 
@@ -84,11 +87,11 @@ The word `null` is reserved to prevent its use as an identifier.
 
 #### 2.5.1. Variables
 
-A variable is a reserved space in memory used to store a value.
+A variable is a named storage location used to hold a value.
 
 #### 2.5.2. Arrays
 
-An array is a collection of n reserved memory positions, each used to store a value.
+An array is a collection of indexed positions, each capable of holding a value.
 
 ## 3. Instructions
 
@@ -120,7 +123,9 @@ The syntax of this instruction is as follows:
 
 #### 3.1.4. Read
 
-This instruction allows you to read a value from the keyboard, determining the type of value you want to read.
+This instruction allows you to read a value from the keyboard, allowing you to specify the type of value to read.
+
+The read instruction currently supports `str` and `num` as input types.
 
 The syntax of this instruction is as follows:
 * `read type_of_value_to_read;`
@@ -136,14 +141,18 @@ The syntax of this instruction is as follows:
 
 #### 3.2.2. Arr
 
-This instruction allows you to create an array with an exact number of positions.
+This instruction allows you to create an array with a specified number of positions.
 
 The syntax of this instruction is as follows:
 * `arr name_of_array[number_of_positions]:type_of_value_allowed;`
+
 ### 3.3. Arithmetic Operators
+
+Since all values are handled through the stack, which follows the LIFO (Last In, First Out) principle, `first_value_of_stack` refers to the value at the top of the stack when the instruction is executed. `second_value_of_stack` refers to the value immediately below it, which was pushed onto the stack before the first value.
+
 #### 3.3.1. Add
 
-This instruction takes the top two values from the stack and adds them together in the following way:
+This instruction adds the top two values on the stack.
 * `first_value_of_stack + second_value_of_stack`
 
 The resulting value is put on top of the stack.
@@ -153,7 +162,7 @@ The syntax of this instruction is as follows:
 
 #### 3.3.2. Sub
 
-This instruction takes the top two values from the stack and subtracts them in the following way:
+This instruction subtracts the top two values on the stack.
 * `first_value_of_stack - second_value_of_stack`
 
 The resulting value is put on top of the stack.
@@ -163,7 +172,7 @@ The syntax of this instruction is as follows:
 
 #### 3.3.3. Mult
 
-This instruction takes the top two values from the stack and multiplies them in the following way:
+This instruction multiplies the top two values on the stack.
 * `first_value_of_stack * second_value_of_stack`
 
 The resulting value is put on top of the stack.
@@ -173,7 +182,7 @@ The syntax of this instruction is as follows:
 
 #### 3.3.4. Div
 
-This instruction takes the top two values from the stack and divides them in the following way:
+This instruction divides the top two values on the stack.
 * `first_value_of_stack / second_value_of_stack`
 
 The resulting value is put on top of the stack.
@@ -183,95 +192,100 @@ The syntax of this instruction is as follows:
 
 #### 3.3.5. Mod
 
-This instruction takes the top two values from the stack and calculates their modulo in the following way:
+This instruction calculates the remainder of the division of the top two values on the stack.
 * `first_value_of_stack % second_value_of_stack`
 
 The resulting value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `mod;`
+
 ### 3.4. Comparison Operators
+
+Since all values are handled through the stack, which follows the LIFO (Last In, First Out) principle, `first_value_of_stack` refers to the value at the top of the stack when the instruction is executed. `second_value_of_stack` refers to the value immediately below it, which was pushed onto the stack before the first value.
+
 #### 3.4.1. Equal
 
 This instruction takes the top two values from the stack and checks whether they are equal. Two values are considered equal only if they have the same type and the same value. For example, the number `5` and the string `"5"` are not considered equal.
 
-The resulting boolean value is put on top of the stack.
+The resulting Boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `equal;`
 
-#### 3.4.2. Bigger
+#### 3.4.2. Greater
 
-This instruction takes the top two values from the stack and checks whether one value is bigger than the other in the following way:
+This instruction takes the top two values from the stack and checks whether the first value is greater than the second.
 * `first_value_of_stack > second_value_of_stack`
 
 In the case of strings, lexicographical comparison based on UTF-8 bytes (case-sensitive) is used.
 
-The resulting boolean value is put on top of the stack.
+The resulting Boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
-* `bigger;`
+* `greater;`
 
-#### 3.4.3. Lower
+#### 3.4.3. Less
 
-This instruction takes the top two values from the stack and checks whether one value is lower than the other in the following way:
+This instruction takes the top two values from the stack and checks whether the first value is less than the second.
 * `first_value_of_stack < second_value_of_stack`
 
 In the case of strings, lexicographical comparison based on UTF-8 bytes (case-sensitive) is used.
 
-The resulting boolean value is put on top of the stack.
+The resulting Boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
-* `lower;`
+* `less;`
 
-#### 3.4.4. BiggerEqual
+#### 3.4.4. GreaterEqual
 
-This instruction takes the top two values from the stack and checks whether one value is bigger than or equal to the other in the following way:
+This instruction compares the top two values on the stack and checks whether the first value is greater than or equal to the second.
 * `first_value_of_stack >= second_value_of_stack`
 
-In the case of strings, lexicographical comparison is used.
+In the case of strings, lexicographical comparison based on UTF-8 bytes (case-sensitive) is used.
 
-The resulting boolean value is put on top of the stack.
+The resulting Boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
-* `biggerEqual;`
+* `greaterEqual;`
 
-#### 3.4.5. LowerEqual
+#### 3.4.5. LessEqual
 
-This instruction takes the top two values from the stack and checks whether one value is lower than or equal to the other in the following way:
+This instruction compares the top two values on the stack and checks whether the first value is less than or equal to the second.
 * `first_value_of_stack <= second_value_of_stack`
 
-In the case of strings, lexicographical comparison is used.
+In the case of strings, lexicographical comparison based on UTF-8 bytes (case-sensitive) is used.
 
-The resulting boolean value is put on top of the stack.
+The resulting Boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
-* `lowerEqual;`
+* `lessEqual;`
 
 ### 3.5. Logical Operators
+
 #### 3.5.1. And
 
-This instruction takes the top two values from the stack and checks whether both values are true.
+This instruction takes the top two values from the stack and checks whether both values are the Boolean value `true`.
 
-The resulting boolean value is put on top of the stack.
+The resulting Boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `and;`
 
 #### 3.5.2. Or
 
-This instruction takes the top two values from the stack and checks whether at least one of the values is true.
+This instruction takes the top two values from the stack and checks whether at least one of the values is the Boolean value `true`.
 
-The resulting boolean value is put on top of the stack.
+The resulting Boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `or;`
 
 #### 3.5.3. Not
 
-This instruction takes the value at the top of the stack and, if it is a boolean value, returns its complement.
+This instruction takes the value at the top of the stack and, if it is a Boolean value, returns its logical negation.
 
-The resulting boolean value is put on top of the stack.
+The resulting Boolean value is put on top of the stack.
 
 The syntax of this instruction is as follows:
 * `not;`
@@ -280,7 +294,7 @@ The syntax of this instruction is as follows:
 
 #### 3.6.1. If
 
-This instruction takes the value at the top of the stack and, if it is a boolean true, executes the instructions inside the if block. There is also the option to define an alternative block that will be executed if the value is boolean false.
+This instruction takes the value at the top of the stack. If the value is the Boolean value `true`, the instructions inside the if block are executed. Otherwise, an optional else block can be executed if the value is the Boolean value `false`.
 
 The syntax of this instruction is as follows:
 ```
@@ -295,7 +309,7 @@ else{
 
 #### 3.6.2. While
 
-This instruction takes the value at the top of the stack and, if it is a boolean true, executes the instructions inside the while block. When the block of instructions finishes, the condition is checked again.
+This instruction takes the value at the top of the stack. If it is the Boolean value `true`, the instructions inside the while block are executed. Once the block finishes executing, the interpreter takes the value at the top of the stack again and checks whether it is `true`. This process continues as long as the condition evaluates to `true`.
 
 The syntax of this instruction is as follows:
 ```
@@ -362,4 +376,4 @@ This error occurs when an instruction expects a colon `:` but does not find one.
 
 This error occurs when an instruction expects a data type but does not find one.
 
-### 4.2 Runtime Errors
+### 4.2. Runtime Errors
