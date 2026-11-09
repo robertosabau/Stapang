@@ -6,8 +6,10 @@ pub struct Variable{
 #[derive(PartialEq,Clone,Debug)]
 pub enum VariableType{
     Text,
-    Number,
+    Float,
     Boolean,
+    Int,
+    Index,
     Any,
 }
 impl Variable{
@@ -41,14 +43,16 @@ impl Variable{
         //Cases of every type
         match self.kind{
             VariableType::Text => return matches!(kind, value::ValueType::Text(_)),
-            VariableType::Number => return matches!(kind, value::ValueType::Number(_)),
+            VariableType::Float => return matches!(kind, value::ValueType::Float(_))||matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::Index(_)),
             VariableType::Boolean => return matches!(kind, value::ValueType::Boolean(_)),
             VariableType::Any => return true,
+            VariableType::Int => return matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::Index(_)),
+            VariableType::Index =>matches!(kind, value::ValueType::Index(_)),
         }
     }
 }
 impl VariableType{
     pub fn valid_to_read(&self)->bool{
-        matches!(self,VariableType::Text)||matches!(self,VariableType::Number)
+        matches!(self,VariableType::Text)||matches!(self,VariableType::Float)
     }
 }

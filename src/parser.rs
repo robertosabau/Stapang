@@ -159,7 +159,7 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
             };
             return Err(error);
         }
-        kind=value_source::Identifier::Array { name, position:Box::new(value_source::ValueSource::Literal(value::Value::set_as_number(num.parse::<f64>().unwrap()))) }
+        kind=value_source::Identifier::Array { name, position:Box::new(value_source::ValueSource::Literal(value::Value::set_as_float(num.parse::<f64>().unwrap()))) }
     }
     else {
         *index -= 1;
@@ -206,7 +206,18 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
             node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_false())}
         },
         tokens::TokenType::Num=>{
-            node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_number(token.value.clone().parse::<f64>().unwrap()))}
+            if token.value.contains("."){
+                node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_float(token.value.clone().parse::<f64>().unwrap()))}
+            }
+            else{
+                let num=token.value.clone().parse::<i64>().unwrap();
+                if num<0{
+                    node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_int(num))};
+                }
+                else{
+                    node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_index(usize::try_from(num).unwrap()))};
+                }
+            }
         }
         tokens::TokenType::Str=>{
             node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_text(token.value.clone()))}
@@ -233,7 +244,7 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
                     };
                     return Err(error);
                 }
-                node=node::NodeType::Pushnode { value: value_source::ValueSource::Identifier(value_source::Identifier::Array { name, position:Box::new(value_source::ValueSource::Literal(value::Value::set_as_number(num.parse::<f64>().unwrap())))})}
+                node=node::NodeType::Pushnode { value: value_source::ValueSource::Identifier(value_source::Identifier::Array { name, position:Box::new(value_source::ValueSource::Literal(value::Value::set_as_float(num.parse::<f64>().unwrap())))})}
             }
             else{
                 *index-=1;
@@ -656,10 +667,12 @@ fn there_is_a_type(kind:&mut variable::VariableType,token:&mut tokens::Token,tok
     }
     //Checking if the tokens is a type of data
     match token.kind{
-        TokenType::NumType=>*kind=variable::VariableType::Number,
+        TokenType::FloatType=>*kind=variable::VariableType::Float,
         TokenType::StrType=>*kind=variable::VariableType::Text,
         TokenType::BoolType=>*kind=variable::VariableType::Boolean,
         TokenType::AnyType=>*kind=variable::VariableType::Any,
+        TokenType::IntType=>*kind=variable::VariableType::Int,
+        TokenType::IndexType=>*kind=variable::VariableType::Index,
         _=>{
             return false;
         }
