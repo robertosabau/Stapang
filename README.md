@@ -206,7 +206,7 @@ The syntax of this instruction is as follows:
 This instruction takes the top two values from the stack and checks whether one value is bigger than the other in the following way:
 * `first_value_of_stack > second_value_of_stack`
 
-In the case of strings, lexicographical comparison is used.
+In the case of strings, lexicographical comparison based on UTF-8 bytes (case-sensitive) is used.
 
 The resulting boolean value is put on top of the stack.
 
@@ -218,7 +218,7 @@ The syntax of this instruction is as follows:
 This instruction takes the top two values from the stack and checks whether one value is lower than the other in the following way:
 * `first_value_of_stack < second_value_of_stack`
 
-In the case of strings, lexicographical comparison is used.
+In the case of strings, lexicographical comparison based on UTF-8 bytes (case-sensitive) is used.
 
 The resulting boolean value is put on top of the stack.
 
