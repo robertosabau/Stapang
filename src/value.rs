@@ -50,18 +50,10 @@ impl Value{
             kind: ValueType::Number(value)
         }
     }
-    //Checking if it is a number
-    pub fn is_a_number(&self)->bool{
-        matches!(self.kind,ValueType::Number(..))
-    }
     //Create a text value
     pub fn set_as_text(value:String)->Self{
         Self {
             kind: ValueType::Text(value)
         }
-    }
-    //Checking if it is a text
-    pub fn is_a_text(&self)->bool{
-        matches!(self.kind,ValueType::Text(..))
     }
 }
