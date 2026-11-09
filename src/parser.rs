@@ -4,6 +4,7 @@ use crate::parser_error;
 use crate::tokens::TokenType;
 use crate::value;
 use crate::value::ValueType;
+use crate::value_source;
 //Funtion to start the parsing
 pub fn parsing(tokens: Vec<tokens::Token>)->Result<Vec<node::Node>, parser_error::ParserError>{
     let mut node_list:Vec<node::Node>=Vec::new();
@@ -197,16 +198,16 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
     //Match to know which value we have
     match token.kind{
         tokens::TokenType::True =>{
-            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value::set_as_true()}
+            node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_true())}
         }
         tokens::TokenType::False =>{
-            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value::set_as_false() }
+            node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_false())}
         },
         tokens::TokenType::Num=>{
-            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value::set_as_number(token.value.clone())}
+            node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_number(token.value.clone()))}
         }
         tokens::TokenType::Str=>{
-            node=node::NodeType::Pushnode { array: false, name: String::from("Null"), position:Some(0), value:value::Value::set_as_text(token.value.clone())}
+            node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_text(token.value.clone()))}
         }
         tokens::TokenType::Ide=>{
             //Saving the name of the identifier
@@ -230,11 +231,11 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
                     };
                     return Err(error);
                 }
-                node=node::NodeType::Pushnode { array: true, name:name, position:num.parse::<usize>().ok(), value:value::Value::set_as_null()}
+                node=node::NodeType::Pushnode { value: value_source::ValueSource::Identifier(value_source::Identifier::Array { name, position:Box::new(value_source::ValueSource::Literal(value::Value::set_as_number(num)))})}
             }
             else{
                 *index-=1;
-                node=node::NodeType::Pushnode { array: false, name:name, position:Some(0), value:value::Value::set_as_null()}
+                node=node::NodeType::Pushnode { value: value_source::ValueSource::Identifier(value_source::Identifier::Variable(name)) }
             }
         }
         _=>{

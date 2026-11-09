@@ -1,4 +1,4 @@
-use crate::{array, calculator, evaluator_error, node, value, variable::{self, Variable}};
+use crate::{array, calculator, evaluator_error, node, value, value_source, variable::{self, Variable}};
 use std::collections::HashMap;
 use std::io;
 
@@ -187,54 +187,64 @@ fn print_traitment(stack:&mut Vec<value::Value>)->bool{
 //Function to make the traitment of the push value
 fn push_traitment(stack:&mut Vec<value::Value>,node:&node::NodeType,variables:&HashMap<String, variable::Variable>,arrays:&HashMap<String, array::Array>)->Result<bool,evaluator_error::ErrorType>{
     //Checking if we have entered with the correct node to get the atributes
-    if let node::NodeType::Pushnode {array,name,position,value,} = node {
-        //Checking if a value, which is assigned to name de String "Null"
-        if *name==String::from("Null"){
+    if let node::NodeType::Pushnode {value} = node {
+        //Checking if a literal value
+        if let value_source::ValueSource::Literal(value_to_push)=value{
             //Push the value directly
-            stack.push(value.clone());
+            stack.push(value_to_push.clone());
             //Code for ok status
             return Ok(true);
-            
         }
-        //Checking if is an Array
-        if *array==true{
-            //Checking if the array was defined
-            if !arrays.contains_key(name){
-                //Code for array do not found
-                return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
-            }
-            if let Some(array) = arrays.get(name) {
-                match array.get_value(position.unwrap()){
-                    Ok(value)=>{
-                        if value.is_a_null(){
-                            return Err(evaluator_error::ErrorType::ArrayNotInicializated { name:name.clone(),position:position.unwrap()});
-                        }
-                        stack.push(value);
-                        //Code for ok status
-                        return Ok(true);
+        //Checking if is an identifier to get the identifier
+        if let value_source::ValueSource::Identifier(ide)=value{
+            match ide{
+                //Case is a variable
+                value_source::Identifier::Variable(name) =>{
+                    //Checking if the varible was declared
+                    if !variables.contains_key(name){
+                        //Code for variable do not found
+                        return Err(evaluator_error::ErrorType::VariableNotDefined { name:name.clone() });
                     }
-                    Err(_code)=>{
-                        //Code for out of bounds error
-                        return Err(evaluator_error::ErrorType::OutOfBound);
+                    //Push the value in the variable in the stack
+                    if let Some(variable) = variables.get(name) {
+                        if variable.get_value().is_a_null(){
+                            return Err(evaluator_error::ErrorType::VariableNotInicializated { name:name.clone() });
+                        }
+                        stack.push(variable.get_value());
+                    }
+                    //Code for ok status
+                    return Ok(true);
+                }
+                //Case is a array
+                value_source::Identifier::Array { name, position } =>{
+                    //Checking if the array was defined
+                    if !arrays.contains_key(name){
+                        //Code for array do not found
+                        return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
+                    }
+                    
+                    //Push the value in the variable if exists
+                    if let Some(array) = arrays.get(name) {
+                        match array.get_value(position.unwrap()){
+                            Ok(value)=>{
+                                if value.is_a_null(){
+                                    return Err(evaluator_error::ErrorType::ArrayNotInicializated { name:name.clone(),position:position.unwrap()});
+                                }
+                                stack.push(value);
+                                return Ok(true);
+                            }
+                            Err(_)=>{
+                                //Out of bound
+                                return Err(evaluator_error::ErrorType::OutOfBound);
+                            }
+                        }
                     }
                 }
             }
-
+            //Checking if is a array to get the values
+            if let value_source::Identifier::Array { name, position }
         }
         //Continue in case there is only a variable, checking if the variable is defined
-        if !variables.contains_key(name){
-            //Code for variable do not found
-            return Err(evaluator_error::ErrorType::VariableNotDefined { name:name.clone() });
-        }
-        //Push the value in the variable in the stack
-        if let Some(variable) = variables.get(name) {
-            if variable.get_value().is_a_null(){
-                return Err(evaluator_error::ErrorType::VariableNotInicializated { name:name.clone() });
-            }
-            stack.push(variable.get_value());
-        }
-        //Code for ok status
-        return Ok(true);
     }
     //return error (It's not supossed to happend, but just in case)
     else{
