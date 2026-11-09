@@ -27,7 +27,7 @@ Stapang is an interpreted, strongly typed, stack-based programming language. All
 
 ## 2. Getting Started
 
-## 2.1. Basic Syntax
+### 2.1. Basic Syntax
 
 There are two important rules to consider regarding the syntax of Stapang.
 
@@ -41,7 +41,7 @@ Stapang supports single-line comments. To write one, use the `#` character. The 
 
 ### 2.3. Data Types
 
-The following types are available for variables and arrays in Stapang:
+The following data types can be used when declaring variables and arrays in Stapang:
 
 #### 2.3.1. Strings
 
@@ -89,9 +89,15 @@ The word `null` is reserved to prevent its use as an identifier.
 
 A variable is a named storage location used to hold a value.
 
+When a variable is created, it is not initialized.
+
 #### 2.5.2. Arrays
 
-An array is a collection of indexed positions, each capable of holding a value.
+An array is an indexed collection of positions, each capable of holding a value.
+
+Array indexing starts at `0`.
+
+When an array is created, all its positions are uninitialized.
 
 ## 3. Instructions
 
@@ -116,14 +122,14 @@ The syntax of this instruction is as follows:
 
 #### 3.1.3. Print
 
-This instruction takes the value at the top of the stack and prints it on the screen.
+This instruction takes the value at the top of the stack and prints it to the standard output.
 
 The syntax of this instruction is as follows:
 * `print;`
 
 #### 3.1.4. Read
 
-This instruction allows you to read a value from the keyboard, allowing you to specify the type of value to read.
+This instruction allows you to read a value from the standard input and specify its expected data type.
 
 The read instruction currently supports `str` and `num` as input types.
 
@@ -330,7 +336,7 @@ This error occurs when a string literal is not properly closed with the characte
 
 #### 4.1.2. Invalid Character Error
 
-This error occurs when a character that is not allowed in the language syntax is detected. An example would be `$`.
+This error occurs when a character that is not allowed in the language syntax is detected. For example, '$' is not a valid character.
 
 #### 4.1.3. Invalid Identifier Error
 
@@ -377,3 +383,59 @@ This error occurs when an instruction expects a colon `:` but does not find one.
 This error occurs when an instruction expects a data type but does not find one.
 
 ### 4.2. Runtime Errors
+
+Runtime errors occur while the interpreter is executing instructions due to problems that arise during execution.
+
+#### 4.2.1. Boolean Expected Error
+
+This error occurs when an `if` or `while` instruction expects a Boolean value at the top of the stack but finds a value of another type.
+
+#### 4.2.2. Stack Empty Error
+
+This error occurs when an instruction tries to retrieve a value from the stack, but the stack is empty.
+
+#### 4.2.3. Variable Not Defined Error
+
+This error occurs when an instruction tries to access a variable that has not been defined.
+
+#### 4.2.4. Array Not Defined Error
+
+This error occurs when an instruction tries to access an array that has not been defined.
+
+#### 4.2.5. Internal Error
+
+This error occurs when, for any reason, the interpreter reaches a part of the code that should never be executed.
+
+If you encounter this error, please report it and describe the steps that caused it.
+
+#### 4.2.6. Out of Bounds Error
+
+This error occurs when an attempt is made to access an array position outside the array's valid index range.
+
+#### 4.2.7. Invalid Type Error
+
+This error occurs when an operation is performed using a value whose type does not support that operation or is incompatible with the type of the other value.
+
+#### 4.2.8. Division by Zero Error
+
+This error occurs when a division or modulo operation attempts to divide by `0`.
+
+#### 4.2.9. Read Error
+
+This error occurs when the standard input stream (`stdin`) is closed, unavailable, or cannot provide input.
+
+#### 4.2.10. Cannot Convert to Number Error
+
+This error occurs when an attempt is made to convert an invalid string into a number. This usually happens when the `read num;` instruction receives input that cannot be converted to a numeric value.
+
+#### 4.2.11. Invalid Value Error
+
+This error occurs when an attempt is made to assign a value to a variable or an array position that is incompatible with its declared type. For example, assigning a Boolean value to a variable declared as `str`.
+
+#### 4.2.12. Variable Not Initialized Error
+
+This error occurs when an attempt is made to retrieve the value of a variable that has not been initialized.
+
+#### 4.2.13. Array Position Not Initialized Error
+
+This error occurs when an attempt is made to retrieve the value of an array position that has not been initialized.
