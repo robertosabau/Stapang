@@ -53,6 +53,6 @@ impl Variable{
 }
 impl VariableType{
     pub fn valid_to_read(&self)->bool{
-        matches!(self,VariableType::Text)||matches!(self,VariableType::Float)
+        matches!(self,VariableType::Text)||matches!(self,VariableType::Float)||matches!(self,VariableType::Int)||matches!(self,VariableType::Index)
     }
 }
