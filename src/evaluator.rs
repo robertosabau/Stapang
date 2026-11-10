@@ -235,10 +235,8 @@ fn push_traitment(stack:&mut Vec<value::Value>,node:&node::NodeType,variables:&H
                     //Getting the position
                     match &**position{
                         value_source::ValueSource::Literal(val) =>{
-                            if let value::ValueType::Float(num)=val.kind{
-                                if num.clone().is_finite() && num >= 0.0 && num.clone().fract() == 0.0{
-                                    index=num as usize;
-                                }
+                            if let value::ValueType::Index(num)=val.kind{
+                                index=num as usize;
                             }
                         }
                         value_source::ValueSource::Identifier(identifier) =>{},
@@ -498,10 +496,8 @@ fn pop_traitment(variables:&mut HashMap<String, variable::Variable>,arrays:&mut 
                 //Getting the position
                 match &*position{
                     value_source::ValueSource::Literal(val) =>{
-                        if let value::ValueType::Float(num)=val.kind{
-                            if num.clone().is_finite() && num >= 0.0 && num.clone().fract() == 0.0{
-                                index=num as usize;
-                            }
+                        if let value::ValueType::Index(num)=val.kind{
+                            index=num as usize;
                         }
                     }
                     value_source::ValueSource::Identifier(identifier) =>{},
