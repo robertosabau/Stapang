@@ -49,19 +49,31 @@ This type represents character strings encoded in UTF-8.
 
 To create a variable or an array of this type, you must use `str` as the `type_of_value_allowed`.
 
-#### 2.3.2. Numbers
+#### 2.3.2. Float
 
 This type represents double-precision floating-point numbers based on the IEEE 754-2008 standard.
 
-To create a variable or an array of this type, you must use `num` as the `type_of_value_allowed`.
+To create a variable or an array of this type, you must use `float` as the `type_of_value_allowed`.
 
-#### 2.3.3. Boolean
+#### 2.3.3. Int
+
+This type represents a signed 64-bit integer.
+
+To create a variable or an array of this type, you must use `int` as the `type_of_value_allowed`.
+
+#### 2.3.4. Index
+
+This type represents an unsigned integer whose size depends on the target architecture.
+
+To create a variable or an array of this type, you must use `index` as the `type_of_value_allowed`.
+
+#### 2.3.5. Boolean
 
 This type represents a Boolean value that can only have one of two possible values: `true` or `false`.
 
 To create a variable or an array of this type, you must use `bool` as the `type_of_value_allowed`.
 
-#### 2.3.4. Any
+#### 2.3.6. Any
 
 `any` is not a data type itself. Instead, it is a keyword that allows a variable or an array to store values of any supported data type.
 
@@ -131,7 +143,7 @@ The syntax of this instruction is as follows:
 
 This instruction allows you to read a value from the standard input and specify its expected data type.
 
-The read instruction currently supports `str` and `num` as input types.
+The read instruction currently supports `str`, `int`, `float` and `index` as input types.
 
 The syntax of this instruction is as follows:
 * `read type_of_value_to_read;`
@@ -426,7 +438,7 @@ This error occurs when the standard input stream (`stdin`) is closed, unavailabl
 
 #### 4.2.10. Cannot Convert to Number Error
 
-This error occurs when an attempt is made to convert an invalid string into a number. This usually happens when the `read num;` instruction receives input that cannot be converted to a numeric value.
+This error occurs when an attempt is made to convert an invalid string into a number. This usually happens when the read instruction receives input that cannot be converted to the requested numeric type.
 
 #### 4.2.11. Invalid Value Error
 
