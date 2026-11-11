@@ -442,9 +442,9 @@ This error occurs when a division or modulo operation attempts to divide by `0`.
 
 This error occurs when the standard input stream (`stdin`) is closed, unavailable, or cannot provide input.
 
-#### Cannot Convert to Number Error
+#### Cannot Convert to Numeric Type Error
 
-This error occurs when an attempt is made to convert an invalid string into a number. This usually happens when the read instruction receives input that cannot be converted to the requested numeric type.
+This error occurs when an attempt is made to convert an invalid string into a numeric type. This usually happens when the read instruction receives input that cannot be converted to the requested numeric type.
 
 #### Invalid Value Error
 
