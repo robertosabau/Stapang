@@ -67,6 +67,8 @@ This type represents an unsigned integer whose size depends on the target archit
 
 To create a variable or an array of this type, you must use `index` as the `type_of_value_allowed`.
 
+This is the only kind of value that can be used as index in arrays
+
 #### 2.3.5. Boolean
 
 This type represents a Boolean value that can only have one of two possible values: `true` or `false`.
