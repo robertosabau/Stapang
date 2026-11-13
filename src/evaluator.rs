@@ -1,4 +1,4 @@
-use crate::{array, calculator, evaluator_error, node, value, value_source, variable::{self, Variable}};
+use crate::{array, calculator, evaluator_error, node, value::{self}, value_source::{self, ValueSource}, variable::{self, Variable}};
 use std::collections::HashMap;
 use std::io;
 
@@ -181,7 +181,7 @@ fn print_traitment(stack:&mut Vec<value::Value>)->bool{
         value::ValueType::Text(text) =>text,
         value::ValueType::Float(num) =>num.to_string(),
         value::ValueType::Int(num) =>num.to_string(),
-        value::ValueType::Index(num) =>num.to_string(),
+        value::ValueType::UInt(num) =>num.to_string(),
         value::ValueType::Boolean(bool) =>bool.to_string(),
         value::ValueType::Null => return false,
     };
@@ -230,16 +230,11 @@ fn push_traitment(stack:&mut Vec<value::Value>,node:&node::NodeType,variables:&H
                         //Code for array do not found
                         return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
                     }
-                    //Variable for the usize
-                    let mut index:usize=0;
-                    //Getting the position
-                    match &**position{
-                        value_source::ValueSource::Literal(val) =>{
-                            if let value::ValueType::Index(num)=val.kind{
-                                index=num as usize;
-                            }
-                        }
-                        value_source::ValueSource::Identifier(identifier) =>{},
+                    //Getting position in the array
+                    let index:usize;
+                    match get_position_array(variables, arrays, &position){
+                        Ok(num) => index=num,
+                        Err(error) => return Err(error),
                     }
                     //Push the value in the variable if exists
                     if let Some(array) = arrays.get(name) {
@@ -491,16 +486,11 @@ fn pop_traitment(variables:&mut HashMap<String, variable::Variable>,arrays:&mut 
                     //Code for array do not found
                     return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
                 }
-                //Variable for the usize
-                let mut index:usize=0;
-                //Getting the position
-                match &*position{
-                    value_source::ValueSource::Literal(val) =>{
-                        if let value::ValueType::Index(num)=val.kind{
-                            index=num as usize;
-                        }
-                    }
-                    value_source::ValueSource::Identifier(identifier) =>{},
+                //Getting position in the array
+                let index:usize;
+                match get_position_array(variables, arrays, &position){
+                    Ok(num) => index=num,
+                    Err(error) => return Err(error),
                 }
                 let array:&mut array::Array=arrays.get_mut(&name).unwrap();
                 match array.set_value(val, index){
@@ -508,5 +498,45 @@ fn pop_traitment(variables:&mut HashMap<String, variable::Variable>,arrays:&mut 
                     Err(error) =>return Err(error),
                 }
             }
+    }
+}
+//Function to get position
+fn get_position_array(variables:& HashMap<String, variable::Variable>,arrays:& HashMap<String, array::Array>,position: &Box<ValueSource>)->Result<usize,evaluator_error::ErrorType>{
+    match &**position{
+        value_source::ValueSource::Literal(val) =>{
+            if let value::ValueType::UInt(num)=val.kind{
+                return Ok(num as usize);
+            }
+            else{
+                return Err(evaluator_error::ErrorType::InvalidType);
+            }
+        }
+        value_source::ValueSource::Identifier(identifier) =>{
+            match identifier{
+                value_source::Identifier::Variable(name) =>{
+                    let val=match variables.get(name){
+                        Some(value) => value.get_value(),
+                        None =>return Err(evaluator_error::ErrorType::VariableNotDefined { name:name.clone() }),
+                    };
+                    if let value::ValueType::UInt(num)=val.kind{
+                        return Ok(num as usize);
+                    }
+                    else{
+                        return Err(evaluator_error::ErrorType::InvalidType);
+                    }
+                }
+                value_source::Identifier::Array { name, position } =>{
+                    //Checking if the array was defined
+                    if !arrays.contains_key(name){
+                        //Code for array do not found
+                        return Err(evaluator_error::ErrorType::ArrayNotDefined { name:name.clone() });
+                    }
+                    match get_position_array(variables, arrays, position){
+                        Ok(num) => return Ok(num),
+                        Err(error) => return Err(error),
+                    }
+                }
+            }
+        }
     }
 }

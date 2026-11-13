@@ -215,7 +215,7 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
                     node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_int(num))};
                 }
                 else{
-                    node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_index(usize::try_from(num).unwrap()))};
+                    node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_uint(usize::try_from(num).unwrap()))};
                 }
             }
         }
@@ -672,7 +672,7 @@ fn there_is_a_type(kind:&mut variable::VariableType,token:&mut tokens::Token,tok
         TokenType::BoolType=>*kind=variable::VariableType::Boolean,
         TokenType::AnyType=>*kind=variable::VariableType::Any,
         TokenType::IntType=>*kind=variable::VariableType::Int,
-        TokenType::IndexType=>*kind=variable::VariableType::Index,
+        TokenType::UIntType=>*kind=variable::VariableType::UInt,
         _=>{
             return false;
         }

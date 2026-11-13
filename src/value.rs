@@ -5,7 +5,7 @@ pub struct Value{
 #[derive(PartialEq,Clone,Debug)]
 pub enum ValueType{
     Text(String),
-    Index(usize),
+    UInt(usize),
     Int(i64),
     Float(f64),
     Boolean(bool),
@@ -47,9 +47,9 @@ impl Value{
         matches!(self.kind,ValueType::Null)
     }
     //Create a index value
-    pub fn set_as_index(value:usize)->Self{
+    pub fn set_as_uint(value:usize)->Self{
         Self {
-            kind: ValueType::Index(value)
+            kind: ValueType::UInt(value)
         }
     }
     //Create a int value

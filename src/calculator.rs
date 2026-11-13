@@ -15,7 +15,7 @@ pub fn addition(val1:&value::Value,val2:&value::Value)->Result<value::Value,eval
                     return Err(evaluator_error::ErrorType::InternarError);
                 }
                 Pair::Index(num1, num2) => {
-                    return Ok(value::Value::set_as_index(num1+num2));
+                    return Ok(value::Value::set_as_uint(num1+num2));
                 }
                 Pair::Integers(num1,num2) =>{
                     return Ok(value::Value::set_as_int(num1+num2));
@@ -41,7 +41,7 @@ pub fn subtraction(val1:&value::Value,val2:&value::Value)->Result<value::Value,e
                     return Err(evaluator_error::ErrorType::InternarError);
                 }
                 Pair::Index(num1, num2) => {
-                    return Ok(value::Value::set_as_index(num1-num2));
+                    return Ok(value::Value::set_as_uint(num1-num2));
                 }
                 Pair::Integers(num1,num2) =>{
                     return Ok(value::Value::set_as_int(num1-num2));
@@ -67,7 +67,7 @@ pub fn multiply(val1:&value::Value,val2:&value::Value)->Result<value::Value,eval
                     return Err(evaluator_error::ErrorType::InternarError);
                 }
                 Pair::Index(num1, num2) => {
-                    return Ok(value::Value::set_as_index(num1*num2));
+                    return Ok(value::Value::set_as_uint(num1*num2));
                 }
                 Pair::Integers(num1,num2) =>{
                     return Ok(value::Value::set_as_int(num1*num2));
@@ -99,7 +99,7 @@ pub fn divide(val1:&value::Value,val2:&value::Value)->Result<value::Value,evalua
                     if num2==0{
                         return Err(evaluator_error::ErrorType::DivisionByZero);
                     }
-                    return Ok(value::Value::set_as_index(num1/num2));
+                    return Ok(value::Value::set_as_uint(num1/num2));
                 }
                 Pair::Integers(num1,num2) =>{
                     if num2==0{
@@ -134,7 +134,7 @@ pub fn module(val1:&value::Value,val2:&value::Value)->Result<value::Value,evalua
                     if num2==0{
                         return Err(evaluator_error::ErrorType::DivisionByZero);
                     }
-                    return Ok(value::Value::set_as_index(num1/num2));
+                    return Ok(value::Value::set_as_uint(num1/num2));
                 }
                 Pair::Integers(num1,num2) =>{
                     if num2==0{
@@ -337,24 +337,24 @@ fn getting_values_aritmethic(val1:&value::Value,val2:&value::Value)->Result<Pair
             Ok(Pair::Texts(text.clone(),String::from(num.to_string())))
         }
         //Cases one is a text an the other a index
-        (value::ValueType::Text(text),value::ValueType::Index(num))=>{
+        (value::ValueType::Text(text),value::ValueType::UInt(num))=>{
             Ok(Pair::Texts(text.clone(),String::from(num.to_string())))
         }
-        (value::ValueType::Index(num),value::ValueType::Text(text))=>{
+        (value::ValueType::UInt(num),value::ValueType::Text(text))=>{
             Ok(Pair::Texts(text.clone(),String::from(num.to_string())))
         }
         //Cases one is a index and the other a int
-        (value::ValueType::Int(num1),value::ValueType::Index(num2))=>{
+        (value::ValueType::Int(num1),value::ValueType::UInt(num2))=>{
             Ok(Pair::Integers(*num1,i64::try_from(*num2).unwrap()))
         }
-        (value::ValueType::Index(num1),value::ValueType::Int(num2))=>{
+        (value::ValueType::UInt(num1),value::ValueType::Int(num2))=>{
             Ok(Pair::Integers(i64::try_from(*num1).unwrap(),*num2))
         }
         //Cases one is a index and the other a float
-        (value::ValueType::Float(num1),value::ValueType::Index(num2))=>{
+        (value::ValueType::Float(num1),value::ValueType::UInt(num2))=>{
             Ok(Pair::Floats(*num1,*num2 as f64))
         }
-        (value::ValueType::Index(num1),value::ValueType::Float(num2))=>{
+        (value::ValueType::UInt(num1),value::ValueType::Float(num2))=>{
             Ok(Pair::Floats(*num1 as f64,*num2))
         }
         //Cases one is a int and the other a float
@@ -385,7 +385,7 @@ fn getting_values_logical(val1:&value::Value,val2:&value::Value)->Result<Pair,ev
             Ok(Pair::Booleans(*bool1,*bool2))
         }
         //Case all two are index
-        (value::ValueType::Index(num1),value::ValueType::Index(num2))=>{
+        (value::ValueType::UInt(num1),value::ValueType::UInt(num2))=>{
             Ok(Pair::Index(*num1,*num2))
         }
         //Case all two are integers
@@ -393,17 +393,17 @@ fn getting_values_logical(val1:&value::Value,val2:&value::Value)->Result<Pair,ev
             Ok(Pair::Integers(*num1,*num2))
         }
         //Cases one is a index and the other a int
-        (value::ValueType::Int(num1),value::ValueType::Index(num2))=>{
+        (value::ValueType::Int(num1),value::ValueType::UInt(num2))=>{
             Ok(Pair::Integers(*num1,i64::try_from(*num2).unwrap()))
         }
-        (value::ValueType::Index(num1),value::ValueType::Int(num2))=>{
+        (value::ValueType::UInt(num1),value::ValueType::Int(num2))=>{
             Ok(Pair::Integers(i64::try_from(*num1).unwrap(),*num2))
         }
         //Cases one is a index and the other a float
-        (value::ValueType::Float(num1),value::ValueType::Index(num2))=>{
+        (value::ValueType::Float(num1),value::ValueType::UInt(num2))=>{
             Ok(Pair::Floats(*num1,*num2 as f64))
         }
-        (value::ValueType::Index(num1),value::ValueType::Float(num2))=>{
+        (value::ValueType::UInt(num1),value::ValueType::Float(num2))=>{
             Ok(Pair::Floats(*num1 as f64,*num2))
         }
         //Cases one is a int and the other a float

@@ -42,7 +42,7 @@ pub enum TokenType{
     //Types
     FloatType, //Type for float numbers
     IntType, //Type for integers
-    IndexType, //Type for index numbers
+    UIntType, //Type for index numbers
     BoolType, //Type for boolean values
     StrType, //Type for strings
     AnyType, //Type to have every value posible

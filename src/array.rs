@@ -44,11 +44,11 @@ impl Array {
         //Cases of every type
         match self.kind{
             variable::VariableType::Text => return matches!(kind, value::ValueType::Text(_)),
-            variable::VariableType::Float => return matches!(kind, value::ValueType::Float(_))||matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::Index(_)),
+            variable::VariableType::Float => return matches!(kind, value::ValueType::Float(_))||matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::UInt(_)),
             variable::VariableType::Boolean => return matches!(kind, value::ValueType::Boolean(_)),
             variable::VariableType::Any => return true,
-            variable::VariableType::Int => return matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::Index(_)),
-            variable::VariableType::Index =>matches!(kind, value::ValueType::Index(_)),
+            variable::VariableType::Int => return matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::UInt(_)),
+            variable::VariableType::UInt =>matches!(kind, value::ValueType::UInt(_)),
         }
     }
 }

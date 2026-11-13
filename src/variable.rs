@@ -9,7 +9,7 @@ pub enum VariableType{
     Float,
     Boolean,
     Int,
-    Index,
+    UInt,
     Any,
 }
 impl Variable{
@@ -43,16 +43,16 @@ impl Variable{
         //Cases of every type
         match self.kind{
             VariableType::Text => return matches!(kind, value::ValueType::Text(_)),
-            VariableType::Float => return matches!(kind, value::ValueType::Float(_))||matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::Index(_)),
+            VariableType::Float => return matches!(kind, value::ValueType::Float(_))||matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::UInt(_)),
             VariableType::Boolean => return matches!(kind, value::ValueType::Boolean(_)),
             VariableType::Any => return true,
-            VariableType::Int => return matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::Index(_)),
-            VariableType::Index =>matches!(kind, value::ValueType::Index(_)),
+            VariableType::Int => return matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::UInt(_)),
+            VariableType::UInt =>matches!(kind, value::ValueType::UInt(_)),
         }
     }
 }
 impl VariableType{
     pub fn valid_to_read(&self)->bool{
-        matches!(self,VariableType::Text)||matches!(self,VariableType::Float)||matches!(self,VariableType::Int)||matches!(self,VariableType::Index)
+        matches!(self,VariableType::Text)||matches!(self,VariableType::Float)||matches!(self,VariableType::Int)||matches!(self,VariableType::UInt)
     }
 }
