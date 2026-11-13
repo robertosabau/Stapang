@@ -134,13 +134,13 @@ pub fn module(val1:&value::Value,val2:&value::Value)->Result<value::Value,evalua
                     if num2==0{
                         return Err(evaluator_error::ErrorType::DivisionByZero);
                     }
-                    return Ok(value::Value::set_as_uint(num1/num2));
+                    return Ok(value::Value::set_as_uint(num1%num2));
                 }
                 Pair::Integers(num1,num2) =>{
                     if num2==0{
                         return Err(evaluator_error::ErrorType::DivisionByZero);
                     }
-                    return Ok(value::Value::set_as_int(num1/num2));
+                    return Ok(value::Value::set_as_int(num1%num2));
                 }
             }
         }
@@ -182,7 +182,7 @@ pub fn or(val1:&value::Value,val2:&value::Value)->Result<value::Value,evaluator_
 //Function to make the not
 pub fn not(val1:&value::Value)->Result<value::Value,evaluator_error::ErrorType>{
     match val1.kind{
-        value::ValueType::Boolean(val) => return Ok(value::Value::set_as_bool(val)),
+        value::ValueType::Boolean(val) => return Ok(value::Value::set_as_bool(!val)),
         _=> return Err(evaluator_error::ErrorType::InvalidType)
     }
 }
