@@ -128,37 +128,11 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
 fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
-    let name;
     let kind:value_source::Identifier;
-    //Checking if their is an identifier to get where to put the value of the stack
-    if !check_if_is_token(tokens::TokenType::Ide,token, tokens, index, &mut node_tokens){
-        let error=parser_error::ParserError{
-            kind: parser_error::ErrorType::ValueExcepted ,
-            line: token.line,
-        };
-        return Err(error);
-    }
-    name=token.value.clone();
-    //Checking if there is the identifier is for an array
-    if check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
-        let source;
-        match get_position_array(token, tokens, index, &mut node_tokens){
-            Ok(sour) =>source=sour,
-            Err(error) => return Err(error),
-        }
-        //Checking if there is the closing bracked
-        if !check_if_is_token(tokens::TokenType::CBR,token,tokens,index,&mut node_tokens){
-            let error=parser_error::ParserError{
-                kind: parser_error::ErrorType::CloseBrakectExpected,
-                line: token.line,
-            };
-            return Err(error);
-        }
-        kind=value_source::Identifier::Array { name, position:source }
-    }
-    else {
-        *index -= 1;
-        kind=value_source::Identifier::Variable(name)
+    //match to get the identifier
+    match get_identifier(token, tokens, index, &mut node_tokens){
+        Ok(ide) => kind=ide,
+        Err(error) => return Err(error),
     }
     //Checking if the sentence is closed with a semicolon, the end of the sentence
     if !check_if_is_token(tokens::TokenType::EOL,token, tokens, index, &mut node_tokens){
@@ -218,32 +192,11 @@ fn is_push(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usiz
             node=node::NodeType::Pushnode { value: value_source::ValueSource::Literal(value::Value::set_as_text(token.value.clone()))}
         }
         tokens::TokenType::Ide=>{
-            //Saving the name of the identifier
-            let name = token.value.clone();
-            //Checking if there is the identifier is for an array
-            if check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
-                //Checking if there is the number of the position in the array
-                if !check_if_is_token(tokens::TokenType::Num,token,tokens,index,&mut node_tokens){
-                    let error=parser_error::ParserError{
-                        kind: parser_error::ErrorType::NumberExpected,
-                        line: token.line,
-                    };
-                    return Err(error);
-                }
-                let num=token.value.clone();
-                //Checking if there is the closing bracked
-                if !check_if_is_token(tokens::TokenType::CBR,token,tokens,index,&mut node_tokens){
-                    let error=parser_error::ParserError{
-                        kind: parser_error::ErrorType::CloseBrakectExpected,
-                        line: token.line,
-                    };
-                    return Err(error);
-                }
-                node=node::NodeType::Pushnode { value: value_source::ValueSource::Identifier(value_source::Identifier::Array { name, position:Box::new(value_source::ValueSource::Literal(value::Value::set_as_float(num.parse::<f64>().unwrap())))})}
-            }
-            else{
-                *index-=1;
-                node=node::NodeType::Pushnode { value: value_source::ValueSource::Identifier(value_source::Identifier::Variable(name)) }
+            *index-=1;
+            //match to get the identifier
+            match get_identifier(token, tokens, index, &mut node_tokens){
+                Ok(ide) => node=node::NodeType::Pushnode { value: value_source::ValueSource::Identifier(ide) },
+                Err(error) => return Err(error),
             }
         }
         _=>{

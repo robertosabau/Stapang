@@ -14,7 +14,7 @@ pub fn addition(val1:&value::Value,val2:&value::Value)->Result<value::Value,eval
                 Pair::Booleans(_, _) =>{
                     return Err(evaluator_error::ErrorType::InternarError);
                 }
-                Pair::Index(num1, num2) => {
+                Pair::UIntegers(num1, num2) => {
                     return Ok(value::Value::set_as_uint(num1+num2));
                 }
                 Pair::Integers(num1,num2) =>{
@@ -40,7 +40,7 @@ pub fn subtraction(val1:&value::Value,val2:&value::Value)->Result<value::Value,e
                 Pair::Booleans(_, _) =>{
                     return Err(evaluator_error::ErrorType::InternarError);
                 }
-                Pair::Index(num1, num2) => {
+                Pair::UIntegers(num1, num2) => {
                     return Ok(value::Value::set_as_uint(num1-num2));
                 }
                 Pair::Integers(num1,num2) =>{
@@ -66,7 +66,7 @@ pub fn multiply(val1:&value::Value,val2:&value::Value)->Result<value::Value,eval
                 Pair::Booleans(_, _) =>{
                     return Err(evaluator_error::ErrorType::InternarError);
                 }
-                Pair::Index(num1, num2) => {
+                Pair::UIntegers(num1, num2) => {
                     return Ok(value::Value::set_as_uint(num1*num2));
                 }
                 Pair::Integers(num1,num2) =>{
@@ -95,7 +95,7 @@ pub fn divide(val1:&value::Value,val2:&value::Value)->Result<value::Value,evalua
                 Pair::Booleans(_, _) =>{
                     return Err(evaluator_error::ErrorType::InternarError);
                 }
-                Pair::Index(num1, num2) => {
+                Pair::UIntegers(num1, num2) => {
                     if num2==0{
                         return Err(evaluator_error::ErrorType::DivisionByZero);
                     }
@@ -130,7 +130,7 @@ pub fn module(val1:&value::Value,val2:&value::Value)->Result<value::Value,evalua
                 Pair::Booleans(_, _) =>{
                     return Err(evaluator_error::ErrorType::InternarError);
                 }
-                Pair::Index(num1, num2) => {
+                Pair::UIntegers(num1, num2) => {
                     if num2==0{
                         return Err(evaluator_error::ErrorType::DivisionByZero);
                     }
@@ -200,7 +200,7 @@ pub fn equals(val1:&value::Value,val2:&value::Value)->Result<value::Value,evalua
                 Pair::Booleans(bool1, bool2) =>{
                     return Ok(value::Value::set_as_bool(bool1==bool2));
                 }
-                Pair::Index(num1, num2) => {
+                Pair::UIntegers(num1, num2) => {
                     return Ok(value::Value::set_as_bool(num1==num2));
                 }
                 Pair::Integers(num1, num2) => {
@@ -225,7 +225,7 @@ pub fn greater(val1:&value::Value,val2:&value::Value)->Result<value::Value,evalu
                 Pair::Booleans(_, _) =>{
                     return Err(evaluator_error::ErrorType::InvalidType);
                 }
-                Pair::Index(num1, num2) => {
+                Pair::UIntegers(num1, num2) => {
                     return Ok(value::Value::set_as_bool(num1>num2));
                 }
                 Pair::Integers(num1, num2) => {
@@ -250,7 +250,7 @@ pub fn less(val1:&value::Value,val2:&value::Value)->Result<value::Value,evaluato
                 Pair::Booleans(_, _) =>{
                     return Err(evaluator_error::ErrorType::InvalidType);
                 }
-                Pair::Index(num1, num2) => {
+                Pair::UIntegers(num1, num2) => {
                     return Ok(value::Value::set_as_bool(num1<num2));
                 }
                 Pair::Integers(num1, num2) => {
@@ -275,7 +275,7 @@ pub fn greater_equal(val1:&value::Value,val2:&value::Value)->Result<value::Value
                 Pair::Booleans(_, _) =>{
                     return Err(evaluator_error::ErrorType::InvalidType);
                 }
-                Pair::Index(num1, num2) => {
+                Pair::UIntegers(num1, num2) => {
                     return Ok(value::Value::set_as_bool(num1>=num2));
                 }
                 Pair::Integers(num1, num2) => {
@@ -300,7 +300,7 @@ pub fn less_equal(val1:&value::Value,val2:&value::Value)->Result<value::Value,ev
                 Pair::Booleans(_, _) =>{
                     return Err(evaluator_error::ErrorType::InvalidType);
                 }
-                Pair::Index(num1, num2) => {
+                Pair::UIntegers(num1, num2) => {
                     return Ok(value::Value::set_as_bool(num1<=num2));
                 }
                 Pair::Integers(num1, num2) => {
@@ -321,6 +321,14 @@ fn getting_values_aritmethic(val1:&value::Value,val2:&value::Value)->Result<Pair
         //Case all two are strings
         (value::ValueType::Text(text1),value::ValueType::Text(text2))=>{
             Ok(Pair::Texts(text1.clone(),text2.clone()))
+        }
+        //Case all two are uintegers
+        (value::ValueType::UInt(num1),value::ValueType::UInt(num2)) => {
+            Ok(Pair::UIntegers(*num1,*num2))
+        }
+        //Case all two are integers
+        (value::ValueType::Int(num1),value::ValueType::Int(num2)) => {
+            Ok(Pair::Integers(*num1,*num2))
         }
         //Cases one is a text an the other a float
         (value::ValueType::Text(text),value::ValueType::Float(num))=>{
@@ -386,7 +394,7 @@ fn getting_values_logical(val1:&value::Value,val2:&value::Value)->Result<Pair,ev
         }
         //Case all two are index
         (value::ValueType::UInt(num1),value::ValueType::UInt(num2))=>{
-            Ok(Pair::Index(*num1,*num2))
+            Ok(Pair::UIntegers(*num1,*num2))
         }
         //Case all two are integers
         (value::ValueType::Int(num1),value::ValueType::Int(num2))=>{
@@ -420,7 +428,7 @@ fn getting_values_logical(val1:&value::Value,val2:&value::Value)->Result<Pair,ev
 }
 //Enum for pairs
 enum Pair {
-    Index(usize,usize),
+    UIntegers(usize,usize),
     Integers(i64,i64),
     Floats(f64, f64),
     Texts(String, String),
