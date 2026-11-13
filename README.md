@@ -61,11 +61,11 @@ This type represents a signed 64-bit integer.
 
 To create a variable or an array of this type, you must use `int` as the `type_of_value_allowed`.
 
-#### Index
+#### Uint
 
 This type represents an unsigned integer whose size depends on the target architecture.
 
-To create a variable or an array of this type, you must use `index` as the `type_of_value_allowed`.
+To create a variable or an array of this type, you must use `uint` as the `type_of_value_allowed`.
 
 This is the only kind of value that can be used as index in arrays
 
