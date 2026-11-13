@@ -128,7 +128,6 @@ fn generate_node(mut token:&mut tokens::Token,tokens: &Vec<tokens::Token>,mut in
 fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize)->Result<node::Node, parser_error::ParserError>{
     let mut node_tokens:Vec<tokens::Token>=Vec::new();
     let node: node::Node;
-    let num:String;
     let name;
     let kind:value_source::Identifier;
     //Checking if their is an identifier to get where to put the value of the stack
@@ -142,15 +141,11 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
     name=token.value.clone();
     //Checking if there is the identifier is for an array
     if check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
-        //Checking if there is the number of the position in the array
-        if !check_if_is_token(tokens::TokenType::Num,token,tokens,index,&mut node_tokens){
-            let error=parser_error::ParserError{
-                kind: parser_error::ErrorType::NumberExpected,
-                line: token.line,
-            };
-            return Err(error);
+        let source;
+        match get_position_array(token, tokens, index, &mut node_tokens){
+            Ok(sour) =>source=sour,
+            Err(error) => return Err(error),
         }
-        num=token.value.clone();
         //Checking if there is the closing bracked
         if !check_if_is_token(tokens::TokenType::CBR,token,tokens,index,&mut node_tokens){
             let error=parser_error::ParserError{
@@ -159,7 +154,7 @@ fn is_pop(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize
             };
             return Err(error);
         }
-        kind=value_source::Identifier::Array { name, position:Box::new(value_source::ValueSource::Literal(value::Value::set_as_float(num.parse::<f64>().unwrap()))) }
+        kind=value_source::Identifier::Array { name, position:source }
     }
     else {
         *index -= 1;
@@ -718,4 +713,64 @@ fn is_read(token:&mut tokens::Token,tokens:&Vec<tokens::Token>,index: &mut usize
         tokens:node_tokens
     };
     Ok(node)
+}
+//Function to get a identifier
+fn get_identifier(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize,mut node_tokens:&mut Vec<tokens::Token>)->Result<value_source::Identifier,parser_error::ParserError>{
+    //Checking if is an identifier
+    if !check_if_is_token(tokens::TokenType::Ide,token,tokens,index,&mut node_tokens){
+        let error=parser_error::ParserError{
+            kind: parser_error::ErrorType::ValueExcepted,
+            line: token.line,
+        };
+        return Err(error);
+    }
+    //Saving name for identifier
+    let name=token.value.clone();
+    //Checking if the 
+    if check_if_is_token(tokens::TokenType::OBR,token, tokens, index, &mut node_tokens){
+        let source;
+        //Getting posiiton of array
+        match get_position_array(token, tokens, index, &mut node_tokens){
+            Ok(sour) =>source=sour,
+            Err(error) => return Err(error),
+        }
+        //Checking if there is the closing bracked
+        if !check_if_is_token(tokens::TokenType::CBR,token,tokens,index,&mut node_tokens){
+            let error=parser_error::ParserError{
+                kind: parser_error::ErrorType::CloseBrakectExpected,
+                line: token.line,
+            };
+            return Err(error);
+        }
+        //Return identifier
+        return Ok(value_source::Identifier::Array { name, position:source });
+    }
+    else {
+        *index -= 1;
+        return Ok(value_source::Identifier::Variable(name));
+    }
+
+}
+//Function to get position in a array
+fn get_position_array(token:&mut tokens::Token,tokens: &Vec<tokens::Token>,index: &mut usize,mut node_tokens:&mut Vec<tokens::Token>)->Result<Box<value_source::ValueSource>,parser_error::ParserError>{
+    //Checking if there is the number of the position in the array
+    if !check_if_is_token(tokens::TokenType::Num,token,tokens,index,&mut node_tokens){
+        *index-=1;
+        //Checking if is an identifiier
+        match get_identifier(token, tokens, index, node_tokens){
+            Ok(identifier) => return Ok(Box::new(value_source::ValueSource::Identifier(identifier))),
+            Err(error) => return Err(error),
+        }
+        
+    }
+    //Checking if is a valid number 
+    match token.value.parse::<usize>(){
+        Ok(num) => return Ok(Box::new(value_source::ValueSource::Literal(value::Value::set_as_uint(num)))),
+        Err(_) =>{
+            let error=parser_error::ParserError{
+                kind: parser_error::ErrorType::NumberExpected,
+                line: token.line,
+            };
+            return Err(error);}
+    }
 }
