@@ -19,7 +19,6 @@
 4. [Errors](#4-errors)
    - [Syntax Errors](#41-syntax-errors)
    - [Runtime Errors](#42-runtime-errors)
-5. [Examples](#5-examples)
 
 ## 1. What is Stapang?
 
