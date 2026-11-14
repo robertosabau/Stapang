@@ -1,4 +1,4 @@
-use crate::value;
+use crate::{evaluator_error, value};
 pub struct Variable{
     kind: VariableType,
     value: value::Value,
@@ -22,12 +22,12 @@ impl Variable{
     }
     //Function to set the value in a save way
     pub fn set_value(&mut self,value:value::Value)->bool{
-        if self.is_compatible(value.kind.clone()){
-            self.value=value;
-            return true;
-        }
-        else{
-            return false;
+        match self.is_compatible(value.clone()){
+            Ok(val) =>{
+                self.value=val;
+                return true;
+            },
+            Err(_) => false,
         }
     }
     //Function to get the value
@@ -35,19 +35,66 @@ impl Variable{
         self.value.clone()
     }
     //Function to check if is compatible the value with the variable
-    fn is_compatible(&self, kind:value::ValueType)->bool{
+    fn is_compatible(&self, val:value::Value)->Result<value::Value,evaluator_error::ErrorType>{
         //Case of null, perfect
-        if kind==value::ValueType::Null{
-            return true;
+        if val.kind==value::ValueType::Null{
+            return Ok(val);
         }
         //Cases of every type
-        match self.kind{
-            VariableType::Text => return matches!(kind, value::ValueType::Text(_)),
-            VariableType::Float => return matches!(kind, value::ValueType::Float(_))||matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::UInt(_)),
-            VariableType::Boolean => return matches!(kind, value::ValueType::Boolean(_)),
-            VariableType::Any => return true,
-            VariableType::Int => return matches!(kind, value::ValueType::Int(_))||matches!(kind, value::ValueType::UInt(_)),
-            VariableType::UInt =>matches!(kind, value::ValueType::UInt(_)),
+        match (self.kind.clone(),val.kind){
+            //Case string value and string variable
+            (VariableType::Text,value::ValueType::Text(val))=>{
+                return Ok(value::Value::set_as_text(val));
+            }
+            //Case boolean value and boolean variable
+            (VariableType::Boolean,value::ValueType::Boolean(val))=>{
+                return Ok(value::Value::set_as_bool(val));
+            }
+            //Case uint value and uint variable
+            (VariableType::UInt,value::ValueType::UInt(val))=>{
+                return Ok(value::Value::set_as_uint(val));
+            }
+            //Case int value and uint variable
+            (VariableType::UInt,value::ValueType::Int(val))=>{
+                match usize::try_from(val){
+                    Ok(num) =>return Ok(value::Value::set_as_uint(num)),
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidValue),
+                }
+            }
+            //Case float value and uint variable
+            (VariableType::UInt,value::ValueType::Float(val))=>{
+                return Ok(value::Value::set_as_uint(val as usize));
+            }
+            //Case int value and int variable
+            (VariableType::Int,value::ValueType::Int(val))=>{
+                return Ok(value::Value::set_as_int(val));
+            }
+            //Case uint value and int variable
+            (VariableType::Int,value::ValueType::UInt(val))=>{
+                match i64::try_from(val){
+                    Ok(num) =>return Ok(value::Value::set_as_int(num)),
+                    Err(_) => return Err(evaluator_error::ErrorType::InvalidValue),
+                }
+            }
+            //Case float value and int variable
+            (VariableType::Int,value::ValueType::Float(val))=>{
+                return Ok(value::Value::set_as_int(val as i64));
+            }
+            //Case float value and float variable
+            (VariableType::Float,value::ValueType::Float(val))=>{
+                return Ok(value::Value::set_as_float(val));
+            }
+            //Case uint value and float variable
+            (VariableType::Float,value::ValueType::UInt(val))=>{
+                return Ok(value::Value::set_as_float(val as f64));
+            }
+            //Case int value and float variable
+            (VariableType::Float,value::ValueType::Int(val))=>{
+                return Ok(value::Value::set_as_float(val as f64));
+            }
+            _=>{
+                return Err(evaluator_error::ErrorType::InvalidValue);
+            }
         }
     }
 }
