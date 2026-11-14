@@ -32,7 +32,7 @@ There are two important rules to consider regarding the syntax of Stapang.
 
 The first rule is that every instruction must end with a `;`.
 
-The second rule is that Stapang is whitespace-insensitive. This means that you can write all the instructions on one line or use one line for each part of the instruction.
+The second rule is that Stapang is whitespace-insensitive. This means that you can write all the instructions on one line or use multiple lines for one instruction.
 
 ### 2.2. Comments
 
@@ -66,7 +66,7 @@ This type represents an unsigned integer whose size depends on the target archit
 
 To create a variable or an array of this type, you must use `uint` as the `type_of_value_allowed`.
 
-This is the only kind of value that can be used as index in arrays
+This is the only type of value that can be used as an array index.
 
 #### Boolean
 
@@ -102,7 +102,7 @@ The word `null` is reserved to prevent its use as an identifier.
 
 A variable is a named storage location used to hold a value.
 
-When a variable is created, it is not initialized.
+When a variable is created, it is uninitialized and must be assigned a value before it can be read.
 
 Variables are mutable.
 
@@ -112,7 +112,7 @@ An array is an indexed collection of positions, each capable of holding a value.
 
 Array indexing starts at `0`.
 
-When an array is created, all its positions are uninitialized.
+When an array is created, all its positions are uninitialized and must be assigned a value before they can be read.
 
 Arrays are mutable.
 
@@ -122,7 +122,7 @@ Arrays are mutable.
 
 #### Push
 
-This instruction allows you to put a value on top of the stack.
+This instruction pushes a value onto the stack.
 
 The syntax of this instruction is as follows:
 * `push value;`
@@ -131,7 +131,7 @@ The syntax of this instruction is as follows:
 
 #### Pop
 
-This instruction allows you to take the value at the top of the stack and put it inside a variable or an array position.
+This instruction pops the value at the top of the stack and puts it inside a variable or an array position.
 
 The syntax of this instruction is as follows:
 * `pop name_of_variable;`
@@ -148,7 +148,7 @@ The syntax of this instruction is as follows:
 
 This instruction allows you to read a value from the standard input and specify its expected data type.
 
-The read instruction currently supports `str`, `int`, `float` and `index` as input types.
+The read instruction currently supports `str`, `int`, `float` and `uint` as input types.
 
 The syntax of this instruction is as follows:
 * `read type_of_value_to_read;`
@@ -164,7 +164,7 @@ The syntax of this instruction is as follows:
 
 #### Arr
 
-This instruction allows you to create an array with a specified number of positions.
+This instruction allows you to create an array with a specified number of elements.
 
 The syntax of this instruction is as follows:
 * `arr name_of_array[number_of_positions]:type_of_value_allowed;`
@@ -441,7 +441,7 @@ This error occurs when a division or modulo operation attempts to divide by `0`.
 
 This error occurs when the standard input stream (`stdin`) is closed, unavailable, or cannot provide input.
 
-#### Cannot Convert to Numeric Type Error
+#### Numeric Conversion Error
 
 This error occurs when an attempt is made to convert an invalid string into a numeric type. This usually happens when the read instruction receives input that cannot be converted to the requested numeric type.
 
