@@ -452,7 +452,7 @@ fn treatment_read(stack:&mut Vec<value::Value>,format:&variable::VariableType)->
                 val=value::Value::set_as_float(number);
             }
             Err(_) =>{
-                return Err(evaluator_error::ErrorType::CannotConvertToNumber);
+                return Err(evaluator_error::ErrorType::NumericConversionError);
             }
         }
     }

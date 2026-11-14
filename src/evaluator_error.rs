@@ -12,7 +12,7 @@ pub enum ErrorType{
     InvalidType,
     DivisionByZero,
     ReadError,
-    CannotConvertToNumber,
+    NumericConversionError,
     InvalidValue,
     VariableNotInicializated{name:String},
     ArrayNotInicializated{name:String,position:usize},
