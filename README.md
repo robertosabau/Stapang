@@ -30,17 +30,19 @@ Stapang is an interpreted, strongly typed, stack-based programming language. All
 
 ## 2.1. How to get Stapang
 
-To install Stapang, you first need to have Rust and Cargo installed.
+To install Stapang, you first need to have Rust and Cargo installed. You can download and install them from the [official Rust website](https://rust-lang.org/install). Cargo is included in the Rust installation, so you do not need to install it separately.
 
 Once you have installed them, execute the following command:
 
-`cargo install --git https://github.com/robertosabau/Stapang`
+```bash
+cargo install --git https://github.com/robertosabau/Stapang
+```
 
 This command downloads the source code from the repository, compiles it, and installs the Stapang executable on your computer.
 
 Once the installation is complete, you can run Stapang from any directory, provided that Cargo's binary directory is included in your system's PATH.
 
-Note: Stapang source files are plain text files, so any text editor can be used to create them. However, using the `.sp` extension is recommended to identify Stapang source files.
+**Note:** Stapang source files are plain text files, so any text editor can be used to create them. However, using the `.sp` extension is recommended to identify Stapang source files.
 
 ### 2.2. Basic Syntax
 
