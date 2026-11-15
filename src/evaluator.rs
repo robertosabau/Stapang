@@ -446,18 +446,39 @@ fn treatment_read(stack:&mut Vec<value::Value>,format:&variable::VariableType)->
         }
     }
     input=input.trim_end_matches(&['\n', '\r'][..]).to_string();
-    if *format==variable::VariableType::Float{
-        match input.parse::<f64>(){
-            Ok(number) =>{
-                val=value::Value::set_as_float(number);
-            }
-            Err(_) =>{
-                return Err(evaluator_error::ErrorType::NumericConversionError);
+    match *format{
+        variable::VariableType::Text => val=value::Value::set_as_text(input),
+        variable::VariableType::Float =>{
+            match input.parse::<f64>(){
+                Ok(number) =>{
+                    val=value::Value::set_as_float(number);
+                }
+                Err(_) =>{
+                    return Err(evaluator_error::ErrorType::NumericConversionError);
+                }
             }
         }
-    }
-    else{
-        val=value::Value::set_as_text(input);
+        variable::VariableType::Int =>{
+            match input.parse::<i64>(){
+                Ok(number) =>{
+                    val=value::Value::set_as_int(number);
+                }
+                Err(_) =>{
+                    return Err(evaluator_error::ErrorType::NumericConversionError);
+                }
+            }
+        }
+        variable::VariableType::UInt =>{
+            match input.parse::<usize>(){
+                Ok(number) =>{
+                    val=value::Value::set_as_uint(number);
+                }
+                Err(_) =>{
+                    return Err(evaluator_error::ErrorType::NumericConversionError);
+                }
+            }
+        }
+        _=>unreachable!(),
     }
     stack.push(val);
     Ok(true)
