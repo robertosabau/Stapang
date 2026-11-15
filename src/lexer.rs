@@ -145,7 +145,6 @@ fn is_keyword(list: &mut Vec<tokens::Token>,text: &String,_line: usize)->bool{
         "not"=>token_kind=tokens::TokenType::Not,
         "true"=>token_kind=tokens::TokenType::True,
         "false"=>token_kind=tokens::TokenType::False,
-        "null"=>token_kind=tokens::TokenType::Null,
         "uint"=>token_kind=tokens::TokenType::UIntType,
         "int"=>token_kind=tokens::TokenType::IntType,
         "float"=>token_kind=tokens::TokenType::FloatType,

@@ -20,7 +20,6 @@ pub enum TokenType{
     //Keyworld no instructions
     True, //Boolean true
     False, //Boolean false
-    Null, //No value
     //Operators
     Add, // +
     Sub, // -
