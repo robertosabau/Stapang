@@ -19,6 +19,7 @@
 4. [Errors](#4-errors)
    - [Syntax Errors](#41-syntax-errors)
    - [Runtime Errors](#42-runtime-errors)
+5. [Examples](#5-examples)
 
 ## 1. What is Stapang?
 
@@ -456,3 +457,282 @@ This error occurs when an attempt is made to retrieve the value of a variable th
 #### Array Position Not Initialized Error
 
 This error occurs when an attempt is made to retrieve the value of an array position that has not been initialized.
+
+## 5. Examples
+
+Here are some examples of common programming problems and possible solutions implemented in Stapang.
+
+### Hello World
+
+In this example, we are going to perform the classic task of printing `"Hello World"`:
+
+**Code:**
+```stapang
+push "Hello World"; # We push the value we want to print onto the top of the stack
+print; # We print the value at the top of the stack
+```
+
+**Output:**
+```
+Hello World
+```
+
+### Basic Arithmetic
+
+In this example, we are going to read two integer numbers and perform the four basic arithmetic operations: addition, subtraction, multiplication, and division.
+
+**Code:**
+```stapang
+# Declaration of variables to store the numbers
+var num1 : int;
+var num2 : int;
+
+# Reading the first number
+push "Enter a number: ";
+print;
+read int;
+pop num1;
+
+# Reading the second number
+push "Enter another number: ";
+print;
+read int;
+pop num2;
+
+# Calculate and print the addition (num1+num2)
+push num2;
+push num1;
+add;
+push "Addition: ";
+print;
+print;
+
+# Printing a line break for better readability
+push "\n";
+print;
+
+# Calculate and print the subtraction (num1-num2)
+push num2;
+push num1;
+sub;
+push "Subtraction: ";
+print;
+print;
+
+# Printing a line break for better readability
+push "\n";
+print;
+
+# Calculate and print the multiplication (num1*num2)
+push num2;
+push num1;
+mult;
+push "Multiplication: ";
+print;
+print;
+
+# Printing a line break for better readability
+push "\n";
+print;
+
+# Calculate and print the division (num1/num2)
+push num2;
+push num1;
+div;
+push "Division: ";
+print;
+print;
+```
+
+**Example execution:**
+```
+Enter a number: 4
+Enter another number: 2
+Addition: 6
+Subtraction: 2
+Multiplication: 8
+Division: 2
+```
+
+### Variable Manipulation
+
+In this example, we are going to read two numbers, store them in two variables, and swap their values using a third variable. Finally, we will print the resulting values.
+
+**Code:**
+```stapang
+# Declaration of variables to store the numbers
+var num1 : int;
+var num2 : int;
+var temp : int;
+
+# Reading the first number
+push "Enter a number: ";
+print;
+read int;
+pop num1;
+
+# Reading the second number
+push "Enter another number: ";
+print;
+read int;
+pop num2;
+
+# Printing the initial values
+push "\n";
+push num1;
+push "num1 = ";
+print;
+print;
+print;
+push "\n";
+push num2;
+push "num2 = ";
+print;
+print;
+print;
+
+# Swapping the values
+push num1;
+pop temp;
+push num2;
+pop num1;
+push temp;
+pop num2;
+
+# Printing the resulting values
+push "\n";
+push num1;
+push "num1 = ";
+print;
+print;
+print;
+push "\n";
+push num2;
+push "num2 = ";
+print;
+print;
+print;
+```
+
+**Example execution:**
+```
+Enter a number: 2
+Enter another number: 4
+num1 = 2
+num2 = 4
+num1 = 4
+num2 = 2
+```
+
+### Conditional Statements
+
+In this example, we are going to ask the user for an integer and indicate whether the number is positive, negative, or zero.
+
+**Code:**
+```stapang
+# Declaration of a variable to store the number
+var num : int;
+
+# Reading the number
+push "Enter a number: ";
+print;
+read int;
+pop num;
+
+# Checking if the number is greater than 0 (number>0)
+push 0;
+push num;
+greater;
+if {
+    push "The number is positive";
+    print;
+}
+else{
+    # Checking if the number is less than 0 (number<0)
+    push 0;
+    push num;
+    less;
+    if{
+        push "The number is negative";
+        print;
+    }
+    else{
+        push "The number is 0";
+        print;
+    }
+}
+```
+
+**Example execution 1:**
+```
+Enter a number: 9
+The number is positive
+```
+
+**Example execution 2:**
+```
+Enter a number: -5
+The number is negative
+```
+
+**Example execution 3:**
+```
+Enter a number: 0
+The number is 0
+```
+
+### Loops and Arrays
+
+In this example, we are going to initialize an array with five values and use a loop to print all of them.
+
+**Code:**
+```stapang
+# Array declaration
+arr numbers[5] : int;
+
+# Declaration of a variable to store the array index
+var index: uint;
+
+# Array initialization (not the recommended way to do it: {0,-53,10,20,4})
+push 4;
+push 20;
+push 10;
+push -53;
+push 0;
+pop numbers[0];
+pop numbers[1];
+pop numbers[2];
+pop numbers[3];
+pop numbers[4];
+
+# Initialize the index
+push 0;
+pop index;
+
+push true; # Push true to enter the first iteration
+while {
+    # Printing the value at the current index
+    push "\n";
+    push numbers[index];
+    print;
+    print;
+    # Incrementing the index
+    push 1;
+    push index;
+    add;
+    pop index;
+    # Checking if the index is less than or equal to 4
+    push 4;
+    push index;
+    lessEqual;
+}
+```
+
+**Output:**
+```
+0
+-53
+10
+20
+4
+```
