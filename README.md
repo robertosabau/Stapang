@@ -194,6 +194,8 @@ This instruction adds the top two values on the stack.
 
 The result is pushed onto the stack.
 
+If either of the top two values on the stack is a `str`, the instruction concatenates them.
+
 The syntax is as follows:
 * `add;`
 
